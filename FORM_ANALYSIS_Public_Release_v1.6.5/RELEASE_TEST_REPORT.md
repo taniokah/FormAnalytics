@@ -91,3 +91,19 @@ The simplified sequential contact heuristic is present in the distributed JavaSc
 - Overlay redraw is invoked at fullscreen transitions. Real pose/force inference with recorded footage, iPhone Safari actual-device behavior, and patented model accuracy are **NOT VERIFIED**.
 
 - 同版再更新: ホームの投球方向・投球腕フィールドと既存設定キーへの連携を追加（構文・ZIP確認）。
+
+## v1.6.5 同版更新：左右足の高さ差に基づく接地候補
+- `node --check`: アプリJS / Service Worker 構文チェック合格。
+- 生成姿勢系列による10件のテスト合格：同高支持、踏込足離地、軸足離地、踵のみ上昇、短時間ノイズ、キーポイント欠落、F1=0、F2=0、左右投球腕入替、スケール欠落時のフォールバック。
+- ブラウザ画面の静的起動テスト合格：Chromiumの390px・768px・1440pxでJavaScript実行時エラーなし。外部アセットを使わないHTML直結テスト。
+- 画像の実測足場条件やiPhone Safari上での動画解析精度は未検証。
+- CSV `contactSource` の文字列列出力と高さ差列を追加。推定を実測床反力と取り違えないこと。
+
+## iPhone動画読み込み180秒対応（同一v1.6.5再修正）
+
+- `node --check js/public-v1.6.5.js`：成功。
+- Chromium 390px 模擬動画読込テスト：60秒、179秒は待機中、180秒経過で画面内に持続的なエラーを表示：成功。
+- Chromium 390px 模擬動画読込テスト：90秒で `loadedmetadata` を受信後に解析画面へ移行：成功。
+- Chromium 390px 実MP4（2秒、H.264、320×240）をファイル入力から読み込み、duration/サイズを取得：成功。
+- 既存の簡易接地・離地判定および支持反力配分の10項目単体テスト：成功（踏込・軸足の離地／接地、短時間ノイズ、踵のみ上昇、左右入替等）。
+- 実機iPhone Safariでの読み込み、および大容量MOV/HEVCの読み込みは未検証。ファイル選択画面が閉じることはiOS標準動作であり、メモリ不足によるタブ再起動や非対応コーデックは待機時間延長だけでは防げません。

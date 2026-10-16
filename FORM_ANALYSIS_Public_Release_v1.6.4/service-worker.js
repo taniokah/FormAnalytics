@@ -1,6 +1,6 @@
 /* Public Preview PWA, local same-origin assets only. */
-const CACHE='form-analysis-public-preview-v1.6.3-equal-height-4';
-const FILES=['./','./index.html','./js/public-v1.6.3.js','./css/public-v1.6.3.css','./manifest.webmanifest','./icons/icon.svg',
+const CACHE='form-analysis-public-preview-v1.6.4-fullscreen-1';
+const FILES=['./','./index.html','./js/public-v1.6.4.js','./css/public-v1.6.4.css','./manifest.webmanifest','./icons/icon.svg',
  './vendor/vision_bundle.mjs','./vendor/wasm/vision_wasm_internal.js','./vendor/wasm/vision_wasm_internal.wasm',
  './vendor/wasm/vision_wasm_nosimd_internal.js','./vendor/wasm/vision_wasm_nosimd_internal.wasm',
  './vendor/pose_landmarker_heavy.task','./vendor/pose_landmarker_full.task'];

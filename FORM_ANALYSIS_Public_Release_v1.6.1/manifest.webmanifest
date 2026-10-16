@@ -1,0 +1,17 @@
+{
+  "name": "FORM ANALYSIS Public Preview v1.5",
+  "short_name": "FORM ANALYSIS",
+  "description": "公開用・ブラウザ内2Dフォーム参考解析",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f7f6",
+  "theme_color": "#0d2934",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

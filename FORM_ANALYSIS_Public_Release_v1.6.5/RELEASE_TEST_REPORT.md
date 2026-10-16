@@ -44,14 +44,14 @@ The simplified sequential contact heuristic is present in the distributed JavaSc
 - Original 20-second maximum and per-foot force math unchanged.
 - JavaScript syntax and ZIP integrity checked. Browser UI tests passed at 390×844, 768×1024, 1024×768, and 1440×900 without JS errors or horizontal overflow. Synthetic SVG tests confirmed both overlaid curves appear on a single toggle ON and both disappear on OFF. Actual footage-based inference remains unverified.
 
-## v1.6.4 UI tests (synthetic data)
+## v1.6.5 UI tests (synthetic data)
 - Chromium via inline HTML/CSS/JavaScript harness, 320×700, 390×844, 768×1024, 1440×900: **PASS**, no JavaScript page errors.
 - Current time 4.35 s maps to nearest sample and updates lead and drive resultant tabs to 45.7 N and 98.3 N: **PASS**.
 - Out-of-range playback position displays “—”, L/R values display within a shared tab, selected series toggle still works: **PASS**.
 - Mobile chart height >=320 px, minimum series tab width >=106 px, tab horizontal overflow without squeezing the SVG: **PASS**.
 - Full 20-second video analysis with real MediaPipe and Safari device: **NOT RETESTED**.
 
-### v1.6.4 再作成版の確認項目
+### v1.6.5 再作成版の確認項目
 - 2行表示の系列ボタン／指標カード（3行目の補足説明を非表示）
 - 系列ボタン高さはPC 37px／幅767px以下 30px
 - 解析の実行結果は変更せず、動画シーク位置の現在値表示を維持
@@ -64,7 +64,7 @@ The simplified sequential contact heuristic is present in the distributed JavaSc
 - 実動画によるMediaPipe動作確認とiPhone Safari実機検証は未実施。
 
 
-### v1.6.4 compact controls 修正検証
+### v1.6.5 compact controls 修正検証
 - グラフ上部の「床反力 N」トグルとPNG・CSVボタンの高さ・文字サイズが一致することをChromiumで検証。
 - 画面幅320px、375px、390px、430px、768px、1440pxで高さはそれぞれ21、21、24、16、21、23px。各画面幅で3つの操作が一致。
 - 全6画面幅でトグルのチェック操作・再チェック動作、6系列タブの存在、JavaScriptエラーなし、ページ横はみ出しなしを確認。
@@ -72,7 +72,7 @@ The simplified sequential contact heuristic is present in the distributed JavaSc
 - ブラウザテストはChromiumによる模擬解析データ使用。iPhone実機Safariおよび実動画解析は未検証。
 
 
-### v1.6.4 外枠高さの統一検証（再修正版）
+### v1.6.5 外枠高さの統一検証（再修正版）
 - 「床反力 N」「↓ PNG」「↓ CSV」の3つの外枠を同じ固定border-box高さ、同一の文字サイズ、同一の上端位置に指定。
 - Chromiumで320px・375px・390px・430px・768px・1440pxを測定し、各幅で3つの高さ（23/23/24/24/26/26px）、文字サイズ、上端座標が一致することを確認（誤差0px）。
 - すべての幅で「床反力 N」ON/OFF切替、既存系列タブ、ページ横方向はみ出しなし、JavaScriptエラーなしを確認。
@@ -81,7 +81,7 @@ The simplified sequential contact heuristic is present in the distributed JavaSc
 
 
 
-## v1.6.4 fullscreen controller / player QA
+## v1.6.5 fullscreen controller / player QA
 
 - Browser: Chromium headless, app HTML/CSS/JS inlined to avoid external network (media file generated locally). Existing application code ran without console pageerrors.
 - Tested desktop 1366×768, mobile emulation 390×844 and 320×667, tablet 768×1024.
@@ -89,3 +89,5 @@ The simplified sequential contact heuristic is present in the distributed JavaSc
 - 3-second locally generated MP4: play advances currentTime, pause works, seeking to 1.7s updates video time, back/forward step changes time. Controls remain visible in fullscreen. **PASS**.
 - Disable Element.requestFullscreen to exercise CSS fullscreen fallback. Transport remains visible and Escape exits. **PASS** on all four viewports.
 - Overlay redraw is invoked at fullscreen transitions. Real pose/force inference with recorded footage, iPhone Safari actual-device behavior, and patented model accuracy are **NOT VERIFIED**.
+
+- 同版再更新: ホームの投球方向・投球腕フィールドと既存設定キーへの連携を追加（構文・ZIP確認）。

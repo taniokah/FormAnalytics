@@ -1,4 +1,4 @@
-# FORM ANALYSIS Public Preview v1.6.4
+# FORM ANALYSIS Public Preview v1.6.5
 
 This public preview uses a 2D single-pass pose detector with approximate pelvis center, filed support-point load allocation and an elementary, unvalidated sequential foot-motion heuristic. No unreleased 2-pass research contact model, Chandler coefficient correction, segment rotation model or release localization is included.
 
@@ -31,16 +31,18 @@ Run using start_mac.command or start_windows.bat (Python 3). All JavaScript, WAS
 - Terminology in the UI consistently uses 床反力 rather than 地面反力.
 - Chart right-axis heading is 床反力 (N). No estimation formulas changed.
 
-## v1.6.4 changes
+## v1.6.5 changes
 - Graph series toggles display a playback-synchronized value and its unit (e.g. 踏込 合力 / 45.7 N).
 - Combined left/right metrics show both values in their single tab.
 - On narrow screens, the tabs scroll horizontally rather than shrink into illegibility; graph minimum height stays at 320 px on iPhone.
 - After leaving the 20-second analyzed interval, displayed sample values become “—” (no extrapolation).
 - Summary metric cards keep their existing behavior; force formulas and CSV series are unchanged.
 
-### v1.6.4 再作成版の画面
+### v1.6.5 再作成版の画面
 カードは名称と数値・単位の2行で表示します。系列選択ボタンも2行で、スマートフォンでの高さはv1.6.1と同じ30pxです。系列ボタンは横にスクロールできます。
 
-## v1.6.4 フルスクリーン操作
+## v1.6.5 フルスクリーン操作
 
 全画面ボタンはプレイヤー全体（動画・オーバーレイ・再生コントローラ・ステータス）を全画面表示します。同じボタンを再度押すと通常サイズに戻ります。Escape キーでも解除できます。iPhone Safari 等で標準 Fullscreen API が利用できない場合は、画面全体を使う CSS フォールバックに切り替わります。全画面中も再生、一時停止、シーク、コマ送り・戻しを利用できます。
+
+ホーム画面から投球方向（画面右／画面左）と投球腕（右投げ／左投げ）を指定できます。これらは解析設定にも反映されます。

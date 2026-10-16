@@ -7,20 +7,20 @@
 <meta content="#f4f7f6" name="theme-color"/>
 <link href="./manifest.webmanifest" rel="manifest"/>
 <meta content="FORM ANALYSIS 公開プレビュー｜動画から姿勢・並進速度・全身参考支持反力を端末内で計算" name="description"/>
-<title>FORM ANALYSIS — Public Preview v1.6.4</title>
-<link href="./css/public-v1.6.4.css?rev=20261017a" rel="stylesheet"/>
+<title>FORM ANALYSIS — Public Preview v1.6.5</title>
+<link href="./css/public-v1.6.5.css?rev=20261017b" rel="stylesheet"/>
 <link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%230c2936'/%3E%3Cpath d='M9 30V10h22' stroke='%23c7f36b' stroke-width='6' fill='none'/%3E%3C/svg%3E" rel="icon"/>
 </head>
 <body>
 <div class="app" id="app">
 <section aria-label="利用ガイド" class="welcome" id="welcome">
 <div class="guide-shell">
-<div class="guide-mark"><span class="guide-logo">F</span><span>FORM ANALYSIS</span><span class="guide-version">公開版 v1.6.4</span></div>
+<div class="guide-mark"><span class="guide-logo">F</span><span>FORM ANALYSIS</span><span class="guide-version">公開版 v1.6.5</span></div>
 <div class="guide-heading"><span class="guide-eyebrow">かんたん3ステップ</span><h1>動画を選んで、フォームを解析</h1>
 <p>普段のカメラアプリで撮影した投球動画を選ぶだけ。解析はスマートフォン・タブレット内で実行します。</p></div>
 <div aria-label="操作手順" class="guide-steps">
 <div class="guide-step"><span class="step-number">01</span><span class="step-symbol">▣</span><div><strong>動画を撮影</strong><small>標準カメラで全身を横から撮影</small></div></div>
-<div class="guide-step"><span class="step-number">02</span><span class="step-symbol">⚙</span><div><strong>身体情報を入力</strong><small>身長・体重・性別を設定</small></div></div>
+<div class="guide-step"><span class="step-number">02</span><span class="step-symbol">⚙</span><div><strong>身体情報を入力</strong><small>身体情報・投球方向を設定</small></div></div>
 <div class="guide-step"><span class="step-number">03</span><span class="step-symbol">⌁</span><div><strong>解析結果を確認</strong><small>速度・脚別推定反力・距離・エネルギーを確認</small></div></div>
 </div>
 <div class="guide-card">
@@ -29,6 +29,10 @@
 <label>身長 <span>cm</span><input id="guideHeight" inputmode="decimal" max="230" min="80" step="0.1" type="number" value="175"/></label>
 <label>体重 <span>kg</span><input id="guideWeight" inputmode="decimal" max="250" min="10" step="0.1" type="number" value="70"/></label>
 <label>性別 <span>記録のみ</span><select id="guideSex"><option value="unspecified">指定なし</option><option value="male">男性</option><option value="female">女性</option></select></label>
+</div>
+<div class="guide-pitch-fields" aria-label="投球設定">
+<label>投球方向 <span>映像内の方向</span><select id="guideDirection"><option value="right">画面右へ投球 →</option><option value="left">← 画面左へ投球</option></select></label>
+<label>投球腕 <span>右投げ・左投げ</span><select id="guideHand"><option value="right">右投げ</option><option value="left">左投げ</option></select></label>
 </div>
 <label aria-label="動画を選択" class="guide-primary" for="videoFile" id="guideImport" role="button" tabindex="0">▣　動画を選ぶ <span>→</span></label>
 <button class="guide-resume hidden" id="guideResume" type="button">読み込み済みの動画に戻る →</button>
@@ -119,7 +123,7 @@
 </dialog>
 <dialog class="dialog" id="helpDialog">
 <form method="dialog">
-<div class="dialog-head"><h2>FORM ANALYSIS 公開プレビュー v1.6.4</h2><button aria-label="閉じる" value="close">✕</button></div>
+<div class="dialog-head"><h2>FORM ANALYSIS 公開プレビュー v1.6.5</h2><button aria-label="閉じる" value="close">✕</button></div>
 
 
 
@@ -136,6 +140,6 @@
 </dialog>
 <div aria-live="polite" class="actionbar transient" id="actionbar" role="status"><span id="message">画面起動中…</span><button hidden="" id="runAnalysis">解析開始</button><button hidden="" id="cancelAnalysis">中止</button><button aria-label="通知を閉じる" id="dismissMessage" title="通知を閉じる" type="button">✕</button></div>
 <input accept="video/*,.mp4,.mov,.m4v,.webm" aria-label="動画ファイルを選択" class="native-file-input" id="videoFile" type="file"/>
-<script defer="" src="./js/public-v1.6.4.js?rev=20261017a"></script>
+<script defer="" src="./js/public-v1.6.5.js?rev=20261017b"></script>
 </body>
 </html>

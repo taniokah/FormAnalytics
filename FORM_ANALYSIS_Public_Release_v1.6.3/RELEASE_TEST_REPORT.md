@@ -62,3 +62,18 @@ The simplified sequential contact heuristic is present in the distributed JavaSc
 - 動的DOM検証：6系列の系列ボタン生成、補足説明の3行目削除、模擬現在値「2.7 N」「12.3 N」を再生時点として反映。
 - JavaScript構文チェック通過、ZIP整合性・SHA256照合通過予定。
 - 実動画によるMediaPipe動作確認とiPhone Safari実機検証は未実施。
+
+
+### v1.6.3 compact controls 修正検証
+- グラフ上部の「床反力 N」トグルとPNG・CSVボタンの高さ・文字サイズが一致することをChromiumで検証。
+- 画面幅320px、375px、390px、430px、768px、1440pxで高さはそれぞれ21、21、24、16、21、23px。各画面幅で3つの操作が一致。
+- 全6画面幅でトグルのチェック操作・再チェック動作、6系列タブの存在、JavaScriptエラーなし、ページ横はみ出しなしを確認。
+- 最大20秒解析、従来の脚別床反力2系列表示、既存ロジックは未変更。
+- ブラウザテストはChromiumによる模擬解析データ使用。iPhone実機Safariおよび実動画解析は未検証。
+
+
+### v1.6.3 外枠高さの統一検証（再修正版）
+- 「床反力 N」「↓ PNG」「↓ CSV」の3つの外枠を同じ固定border-box高さ、同一の文字サイズ、同一の上端位置に指定。
+- Chromiumで320px・375px・390px・430px・768px・1440pxを測定し、各幅で3つの高さ（23/23/24/24/26/26px）、文字サイズ、上端座標が一致することを確認（誤差0px）。
+- すべての幅で「床反力 N」ON/OFF切替、既存系列タブ、ページ横方向はみ出しなし、JavaScriptエラーなしを確認。
+- Javascript構文検査、配布ZIP内ファイル照合を実施。実動画解析とiPhone実機Safariは未検証。

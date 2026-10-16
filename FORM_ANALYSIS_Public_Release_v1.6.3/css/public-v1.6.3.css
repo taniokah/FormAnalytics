@@ -617,3 +617,113 @@
   .metric .measure {line-height:1.12;}
   #plot{height:320px;min-height:320px;}
 }
+
+
+/* v1.6.3 compact controls: size the GRF checkbox like the PNG/CSV export buttons.
+   No change to the rendering or force-layer selection behavior. */
+.chart-actions .force-toggle {
+  min-height:0;
+  height:auto;
+  padding:5px 7px;
+  border-width:1px;
+  border-radius:9px;
+  gap:4px;
+  font-size:.74rem;
+  font-weight:700;
+  line-height:1;
+}
+.chart-actions .force-toggle > span {
+  font-size:inherit;
+  font-weight:inherit;
+  line-height:inherit;
+}
+.chart-actions .force-toggle input[type=checkbox] {
+  flex:0 0 11px;
+  width:11px;
+  height:11px;
+  border-width:1px;
+  border-radius:3px;
+}
+.chart-actions .force-toggle input[type=checkbox]:checked::after {
+  left:2px;
+  top:0;
+  width:3px;
+  height:6px;
+  border-width:0 2px 2px 0;
+  transform:rotate(43deg);
+}
+@media (max-width:1100px) {
+  .chart-actions .force-toggle {padding:4px 5px;}
+}
+@media (max-width:767px) {
+  .chart-actions .force-toggle {font-size:.64rem;padding:2px 5px;gap:3px;}
+  .chart-actions .force-toggle input[type=checkbox]{flex-basis:10px;width:10px;height:10px;}
+}
+@media (max-width:410px) {
+  .chart-actions .force-toggle {font-size:11px;padding:5px;}
+  .chart-actions .force-toggle input[type=checkbox]{flex-basis:12px;width:12px;height:12px;}
+}
+@media (max-width:380px) {
+  .chart-actions .force-toggle {font-size:10px;padding:4px;}
+  .chart-actions .force-toggle input[type=checkbox]{flex-basis:11px;width:11px;height:11px;}
+}
+
+
+/* v1.6.3: explicit border-box alignment for all three chart toolbar controls.
+   Match the *outer colored frame*, not only typography/intrinsic height.
+   Avoid native Safari button appearance and variable line-height. */
+.chart-actions {
+  --chart-button-height:26px;
+  --chart-button-font:12px;
+  align-items:center;
+}
+.chart-actions > .force-toggle,
+.chart-actions > #exportPng,
+.chart-actions > #exportCsv {
+  box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+  -webkit-appearance:none;
+  appearance:none;
+  display:inline-flex;
+  flex:0 0 auto;
+  align-items:center;
+  justify-content:center;
+  height:var(--chart-button-height);
+  min-height:var(--chart-button-height);
+  max-height:var(--chart-button-height);
+  padding:0 7px;
+  border-width:1px;
+  border-style:solid;
+  border-radius:9px;
+  margin:0;
+  font-family:inherit;
+  font-size:var(--chart-button-font);
+  font-weight:700;
+  line-height:1;
+  white-space:nowrap;
+  vertical-align:middle;
+}
+.chart-actions > .force-toggle {gap:4px; border-color:#f0d5b7;}
+.chart-actions > #exportPng,
+.chart-actions > #exportCsv {border-color:#d6e9de;}
+.chart-actions > .force-toggle > span {
+  font-size:inherit;
+  font-weight:inherit;
+  line-height:1;
+}
+.chart-actions > .force-toggle > input[type=checkbox] {
+  flex:0 0 12px;
+  width:12px;
+  height:12px;
+  box-sizing:border-box;
+}
+@media(max-width:767px){
+  .chart-actions{--chart-button-height:24px;--chart-button-font:11px;}
+  .chart-actions > .force-toggle,
+  .chart-actions > #exportPng,
+  .chart-actions > #exportCsv{padding-inline:5px;}
+}
+@media(max-width:380px){
+  .chart-actions{--chart-button-height:23px;--chart-button-font:10px;}
+  .chart-actions > .force-toggle > input[type=checkbox]{flex-basis:11px;width:11px;height:11px;}
+}

@@ -112,22 +112,21 @@ function detectContactSequence(frames,params,width,heightPx,scale){
     });
   }
   const L=kinematics(lead,baselines.lead),D=kinematics(drive,baselines.drive);
-  // Conventional p5.js-style bilateral foot-height comparison. A foot must
-  // appear higher at BOTH toe and heel; an elevated heel alone still permits
-  // toe-ground contact. The ankle height, when visible, is a cross-check.
-  // The same-frame relative heights avoid dependence on a fixed camera origin.
-  // These thresholds are heuristic (not experimentally calibrated).
-  const HEIGHT_ENTER_M=.075, HEIGHT_EXIT_M=.042, ANKLE_ENTER_M=.045;
+  // Public bilateral sole-height rule (p5.js-style, image-plane proxy):
+  // Whenever BOTH toe AND heel of one foot are clearly higher than those of
+  // the opposite foot, classify the upper foot as airborne and the LOWER
+  // foot as the SOLE supporter. This rule takes precedence over motion stages.
+  // Do not require ankle agreement: ankle keypoints may jitter independently
+  // while the visible toe and heel are unambiguously elevated.
+  // An isolated elevated heel (toe still low) is not evidence of liftoff.
+  // These thresholds are provisional, NOT measured distance from the ground.
+  const HEIGHT_ENTER_M=.075, HEIGHT_EXIT_M=.042;
   function relativeHeightEvidence(l,d,threshold){
     if(!l||!d)return null;
     const toeDiff=(d.toeY-l.toeY)*heightPx*my;
     const heelDiff=(d.heelY-l.heelY)*heightPx*my;
-    const ankleDiff=Number.isFinite(l.ankleY)&&Number.isFinite(d.ankleY)
-      ?(d.ankleY-l.ankleY)*heightPx*my:null;
-    const enough=(sign)=>toeDiff*sign>threshold&&heelDiff*sign>threshold&&
-      (ankleDiff===null||ankleDiff*sign>ANKLE_ENTER_M*(threshold/HEIGHT_ENTER_M));
-    if(enough(1))return 'lead';
-    if(enough(-1))return 'drive';
+    if(toeDiff>threshold&&heelDiff>threshold)return 'lead';
+    if(toeDiff< -threshold&&heelDiff< -threshold)return 'drive';
     return null;
   }
   // Three consecutive reliable observations to enter OR exit the state.
@@ -195,10 +194,14 @@ function detectContactSequence(frames,params,width,heightPx,scale){
   }
   const motionPhases=Array(n).fill(0);
   for(const e of motionEvents)for(let i=e.index;i<n;i++)motionPhases[i]=e.phase;
-  // Explicit relative-height evidence takes precedence over the simplified
-  // fixed event sequence (which may miss a lift with little horizontal travel).
-  // 1: lead airborne; 3: drive airborne. Remaining states come from motion.
+  // Explicit relative-height evidence overrides either motion stage:
+  //   upper lead -> lead OFF, drive ON (phase 1, F1=0, all to F2)
+  //   upper drive -> drive OFF, lead ON (phase 3, F2=0, all to F1)
+  //   indistinguishable heights -> fall back to the existing motion heuristic.
+  // A single phase encodes exactly one supporting foot for height overrides.
   const phases=motionPhases.map((phase,i)=>heightUpper[i]==='lead'?1:heightUpper[i]==='drive'?3:phase);
+  const leadContacts=phases.map(phase=>phase===1?0:1);
+  const driveContacts=phases.map(phase=>phase===3?0:1);
   const contactAt=(phase,foot)=>foot==='lead'?phase!==1:phase!==3;
   // Emit graph/CSV candidate markers from the EFFECTIVE contact state, so
   // events match force allocation even when a height override occurs.
@@ -214,7 +217,7 @@ function detectContactSequence(frames,params,width,heightPx,scale){
     }
   }
   const heightUsed=heightUpper.some(Boolean);
-  return {events,phases,heightUpper,heightDifferenceM,
+  return {events,phases,leadContacts,driveContacts,heightUpper,heightDifferenceM,
     contactSources:phases.map((phase,i)=>heightUpper[i]?'relative-foot-height':
       motionPhases[i]===1||motionPhases[i]===3?'foot-motion':'assumed-both-supported'),
     assumption:heightUsed?'foot-motion-and-relative-foot-height-heuristics':
@@ -329,7 +332,7 @@ function computePublicMetrics(frames,params,width,heightPx){
       mass:params.weight,direction:params.direction,contactPhase:contact.phases[i]});
     const {leadVertical,driveVertical,leadHorizontal,driveHorizontal,
       leadResultant,driveResultant,leadHorizontalWorld,driveHorizontalWorld,shareLead,allocationMethod}=allocation;
-    const obj={t:frame.t,pose:p,center:points.pelvis[i],stride,wristTravel,energy:Number.isFinite(speeds.pelvis[i])?0.5*params.weight*speeds.pelvis[i]**2:null,forceHorizontal,forceVertical,forceTotal,leadVertical,driveVertical,leadHorizontal,driveHorizontal,leadHorizontalWorld,driveHorizontalWorld,leadResultant,driveResultant,shareLead,allocationMethod,contactPhase:contact.phases[i],contactSource:contact.contactSources[i],footHeightDiffM:contact.heightDifferenceM[i],leadContact:contact.phases[i]===1?0:1,driveContact:contact.phases[i]===3?0:1};
+    const obj={t:frame.t,pose:p,center:points.pelvis[i],stride,wristTravel,energy:Number.isFinite(speeds.pelvis[i])?0.5*params.weight*speeds.pelvis[i]**2:null,forceHorizontal,forceVertical,forceTotal,leadVertical,driveVertical,leadHorizontal,driveHorizontal,leadHorizontalWorld,driveHorizontalWorld,leadResultant,driveResultant,shareLead,allocationMethod,contactPhase:contact.phases[i],contactSource:contact.contactSources[i],footHeightDiffM:contact.heightDifferenceM[i],leadContact:contact.leadContacts[i],driveContact:contact.driveContacts[i]};
     for(const k of Object.keys(points))obj[k==='pelvis'?'pelvisSpeed':k==='thorax'?'thoraxSpeed':k]=speeds[k][i];
     return obj;
   });
@@ -694,60 +697,42 @@ function reportInterruptedVideoLoading(){
     }
   }catch{/* Storage may be unavailable. */}
 }
-const VIDEO_LOAD_MAX_MS=180000; // Three minutes, measured from the file selection event.
-function hasVideoMetadata(){
-  return video.readyState>=HTMLMediaElement.HAVE_METADATA && video.videoWidth>0 &&
-    video.videoHeight>0 && Number.isFinite(video.duration) && video.duration>0;
-}
-function mediaLoadError(){
-  const code=video.error?.code;
-  if(!code)return null;
-  const reasons={1:'動画の読み込みが中断されました',2:'動画データを読み取れませんでした',
-    3:'iPhoneで動画をデコードできませんでした',4:'この動画形式には対応していません'};
-  return new Error(`${reasons[code]||'動画を読み込めませんでした'}（エラー ${code}）。端末内に保存したMP4/MOV（H.264または対応HEVC）をお試しください。`);
-}
-// Listen *before* attaching the blob URL. A single overall 180 s deadline
-// prevents a Safari media event or loading-state race from silently timing out.
-function awaitVideoMetadata(token,signal,onProgress){
+const VIDEO_LOAD_MAX_MS=180000;
+// Safari may supply dimensions/duration after loadedmetadata. The successful
+// v1.6.1 import considered HAVE_METADATA sufficient; keep that behavior.
+function awaitVideoMetadata(token, signal, onProgress){
   return new Promise((resolve,reject)=>{
-    const started=Date.now(),events=['loadedmetadata','loadeddata','canplay','durationchange','resize','error','abort','emptied','stalled','suspend'];
-    let timer=null,ticker=null,finished=false;
-    function cleanup(){
-      if(timer!==null)clearTimeout(timer);
-      if(ticker!==null)clearInterval(ticker);
-      events.forEach(name=>video.removeEventListener(name,check));
+    let finished=false;
+    const begin=Date.now();
+    const events=['loadedmetadata','loadeddata','canplay','durationchange','resize','error','abort'];
+    const cleanup=()=>{
+      clearInterval(poll);clearTimeout(timeout);
+      for(const event of events)video.removeEventListener(event,check);
       signal.removeEventListener('abort',cancel);
-    }
-    function finish(error){if(finished)return;finished=true;cleanup();error?reject(error):resolve();}
-    function cancel(){finish(new Error('動画の読み込みを中止しました'));}
-    function check(){
+    };
+    const finish=(err)=>{if(finished)return;finished=true;cleanup();err?reject(err):resolve();};
+    const cancel=()=>finish(Error('動画の読み込みを中止しました'));
+    const check=()=>{
       if(signal.aborted||token!==videoLoadSerial){cancel();return;}
-      if(hasVideoMetadata()){finish();return;}
-      const problem=mediaLoadError();if(problem)finish(problem);
-    }
-    function tick(){
-      if(signal.aborted||token!==videoLoadSerial){cancel();return;}
-      const elapsed=Math.min(180,Math.floor((Date.now()-started)/1000));
-      onProgress(elapsed);
-      check();
-    }
-    for(const name of events)video.addEventListener(name,check);
+      if(video.readyState>=HTMLMediaElement.HAVE_METADATA){finish();return;}
+      if(video.error){finish(Error(`動画のデコードに失敗しました（メディアエラー ${video.error.code}）`));}
+    };
+    for(const event of events)video.addEventListener(event,check);
     signal.addEventListener('abort',cancel,{once:true});
-    timer=setTimeout(()=>finish(new Error('3分間待ちましたが、動画情報を取得できませんでした。動画を端末内に保存してから再度選ぶか、H.264形式のMP4に変換してください。')),VIDEO_LOAD_MAX_MS);
-    ticker=setInterval(tick,1000);
-    tick();
+    const poll=setInterval(()=>{
+      if(finished)return;
+      onProgress(Math.min(180,Math.floor((Date.now()-begin)/1000)));
+      check();
+    },1000);
+    const timeout=setTimeout(()=>finish(Error('3分経過しても動画情報を取得できませんでした。端末に保存した動画を選び直してください。')),VIDEO_LOAD_MAX_MS);
+    queueMicrotask(check);
   });
 }
 async function openVideo(file){
   if(!file)return;
   if(!(file.type.startsWith('video/')||/\.(mp4|mov|webm|m4v)$/i.test(file.name))){
-    $('guideStatus').textContent='動画ファイルを選択してください';
-    $('guideStatus').classList.add('error');
     notify('動画ファイルを選択してください',true);return;
   }
-  // Keep the input's File reference until metadata is available. Clearing
-  // input.value inside Safari's change callback can invalidate a file-backed
-  // blob source on some iOS versions.
   pendingVideoController?.abort();
   const token=++videoLoadSerial,controller=new AbortController();
   pendingVideoController=controller;
@@ -755,67 +740,48 @@ async function openVideo(file){
   stopPlay();
   const previous={url:state.fileURL,mode:state.mode,analysis:state.analysis,t:state.t};
   let url;
-  try{url=URL.createObjectURL(file);}catch(error){
-    const msg='動画を開けませんでした：'+(error?.message||String(error));
-    $('guideStatus').classList.add('error');$('guideStatus').textContent=msg;notify(msg,true);
-    return;
-  }
-  rememberVideoLoading();
-  state.loadingVideo=true;state.mode='empty';state.analysis=null;
-  acceptGuide();
-  const fileLabel=file.name.length>38?`${file.name.slice(0,35)}…`:file.name;
-  function progress(elapsed){
-    const progressText=`${fileLabel}：動画を読み込み中… ${elapsed}秒 / 最大180秒`;
-    $('guideStatus').classList.remove('error');
-    $('guideStatus').textContent=progressText;
-    $('videoMeta').textContent=progressText;
-    $('message').textContent=progressText;
-  }
-  notify('動画の読み込みを開始しました（最大3分間待機します）',true);
-  // Metadata listeners must be active before assigning src / calling load().
-  // Reset any old decoder first, then attach the new URL.
-  let finished=false;
+  try{url=URL.createObjectURL(file);}catch(e){notify('動画を開けませんでした：'+e.message,true);return;}
+  rememberVideoLoading();state.loadingVideo=true;
+  const fileLabel=file.name.length>38?file.name.slice(0,35)+'…':file.name;
+  const progress=elapsed=>{
+    const msg=`${fileLabel}：動画情報を取得中 ${elapsed}秒 / 180秒`;
+    $('guideStatus').classList.remove('error');$('guideStatus').textContent=msg;
+    $('videoMeta').textContent=msg;$('message').textContent=msg;
+  };
+  let success=false;
   try{
-    video.pause();video.removeAttribute('src');video.load();
-    const wait=awaitVideoMetadata(token,controller.signal,progress);
-    video.preload='auto';video.src=url;video.load();
-    await wait;
+    // Register listeners BEFORE changing src, like v1.6.1 otherwise.
+    // Avoid clearing src and calling load() twice, which can interfere with
+    // iOS Photos' file-backed blob URLs.
+    const waiting=awaitVideoMetadata(token,controller.signal,progress);
+    video.preload='metadata';
+    video.src=url;
+    video.load();
+    await waiting;
     if(token!==videoLoadSerial||controller.signal.aborted)return;
-    finished=true;
-    state.fileURL=url;state.mode='video';state.t=0;
+    success=true;
+    state.fileURL=url;state.analysis=null;state.mode='video';state.t=0;
     state.showVideo=true;state.showPose=true;
-    if(previous.url)URL.revokeObjectURL(previous.url);
     updateVideoLayers();
     $('guideStatus').classList.remove('error');
-    $('guideStatus').textContent=`${file.name} を読み込みました`;
-    $('videoMeta').textContent=`${file.name} を読み込みました`;
+    $('guideStatus').textContent=file.name+' を読み込みました';
+    $('videoMeta').textContent=file.name+' を読み込みました';
     resultView();
     notify('動画を読み込みました。解析ボタンを押してください。',true);
-  }catch(error){
+    if(previous.url)URL.revokeObjectURL(previous.url);
+  }catch(e){
     if(token!==videoLoadSerial)return;
-    state.fileURL=previous.url;
-    state.mode=previous.url?previous.mode:'empty';
-    state.analysis=previous.analysis;
-    state.t=previous.t;
-    try{
-      video.pause();video.removeAttribute('src');video.load();
-      if(previous.url){video.src=previous.url;video.load();}
-    }catch(restoreError){console.error('動画の復元に失敗しました',restoreError);}
-    const msg=`動画を読み込めませんでした：${error.message}`;
-    $('guideStatus').classList.add('error');
-    $('guideStatus').textContent=msg;
-    $('videoMeta').textContent=msg;
-    notify(msg,true);
-    // Stay on the import page when no previous playable video exists.
+    const msg='動画を読み込めませんでした：'+e.message;
+    state.fileURL=previous.url;state.mode=previous.url?previous.mode:'empty';
+    state.analysis=previous.analysis;state.t=previous.t;
+    try{video.removeAttribute('src');video.load();if(previous.url){video.src=previous.url;video.load();}}catch{}
+    $('guideStatus').classList.add('error');$('guideStatus').textContent=msg;
+    $('videoMeta').textContent=msg;notify(msg,true);
     if(!previous.url)guide();else render();
-    console.error('動画読込エラー',error);
+    console.error('動画読込エラー',e);
   }finally{
-    if(!finished)URL.revokeObjectURL(url);
-    if(token===videoLoadSerial){
-      clearVideoLoading();
-      state.loadingVideo=false;
-      if(pendingVideoController===controller)pendingVideoController=null;
-    }
+    if(!success)URL.revokeObjectURL(url);
+    if(token===videoLoadSerial){clearVideoLoading();state.loadingVideo=false;if(pendingVideoController===controller)pendingVideoController=null;}
   }
 }
 
@@ -860,7 +826,7 @@ async function snapshot(){
 }
 function exportCsv(){if(!stateReady()){notify('先に解析を実行してください');return;}
   const keys=['t','contactPhase','contactSource','footHeightDiffM','leadContact','driveContact','pelvisSpeed','thoraxSpeed','shoulderL','shoulderR','elbowL','elbowR','wristL','wristR','handTipL','handTipR','forceTotal','forceVertical','forceHorizontal','leadResultant','driveResultant','leadVertical','driveVertical','leadHorizontal','driveHorizontal','leadHorizontalWorld','driveHorizontalWorld','stride','wristTravel','energy','shareLead'];
-  const lines=['# FORM ANALYSIS Public Preview v1.6.5','# Simple single-pass, 2D hip-center proxy: NOT anatomical CoM','# Filed support-point load partition: projected pelvis-center and acceleration, adjusted for candidate foot contact; NOT measured foot GRF',`# height_cm=${state.config.height} weight_kg=${state.config.weight} sex(record-only)=${state.config.sex}`,'# Contact candidates: sequential foot motion + relative bilateral toe/heel/ankle height difference, 3 stable observations; 2D unvalidated heuristic', '# footHeightDiffM: positive means lead foot appears higher than drive; camera perspective, steps and mounds can misclassify support', '# leadHorizontal/driveHorizontal: positive toward pelvis midpoint; *HorizontalWorld signed positive toward pitching direction',`# contact_assumption=${state.analysis.contactAssumption}`,...state.analysis.events.map(e=>`# event=${e.foot}_${e.type},time_s=${e.t.toFixed(3)},quality=candidate`),keys.join(',')];
+  const lines=['# FORM ANALYSIS Public Preview v1.6.5','# Simple single-pass, 2D hip-center proxy: NOT anatomical CoM','# Filed support-point load partition: projected pelvis-center and acceleration, adjusted for candidate foot contact; NOT measured foot GRF',`# height_cm=${state.config.height} weight_kg=${state.config.weight} sex(record-only)=${state.config.sex}`,'# Contact candidates: upper foot airborne / lower foot sole supporter when both toe and heel differ in height for 3 observations; otherwise sequential foot motion. 2D unvalidated heuristic', '# footHeightDiffM: positive means lead foot appears higher than drive; camera perspective, steps and mounds can misclassify support', '# leadHorizontal/driveHorizontal: positive toward pelvis midpoint; *HorizontalWorld signed positive toward pitching direction',`# contact_assumption=${state.analysis.contactAssumption}`,...state.analysis.events.map(e=>`# event=${e.foot}_${e.type},time_s=${e.t.toFixed(3)},quality=candidate`),keys.join(',')];
   for(const row of state.analysis.samples)lines.push(keys.map(k=>
     Number.isFinite(row[k])?row[k].toFixed(5):typeof row[k]==='string'?row[k]:'').join(','));
   const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='FORM_ANALYSIS_PUBLIC_v1.6.5.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notify('CSVを保存しました');

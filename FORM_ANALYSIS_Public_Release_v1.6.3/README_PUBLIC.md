@@ -1,4 +1,4 @@
-# FORM ANALYSIS Public Preview v1.6.1
+# FORM ANALYSIS Public Preview v1.6.3
 
 This public preview uses a 2D single-pass pose detector with approximate pelvis center, filed support-point load allocation and an elementary, unvalidated sequential foot-motion heuristic. No unreleased 2-pass research contact model, Chandler coefficient correction, segment rotation model or release localization is included.
 
@@ -30,3 +30,13 @@ Run using start_mac.command or start_windows.bat (Python 3). All JavaScript, WAS
 - The single checkbox overlays drive (F2) and lead (F1) per-foot resultant floor reaction magnitudes concurrently. Default enabled.
 - Terminology in the UI consistently uses 床反力 rather than 地面反力.
 - Chart right-axis heading is 床反力 (N). No estimation formulas changed.
+
+## v1.6.3 changes
+- Graph series toggles display a playback-synchronized value and its unit (e.g. 踏込 合力 / 45.7 N).
+- Combined left/right metrics show both values in their single tab.
+- On narrow screens, the tabs scroll horizontally rather than shrink into illegibility; graph minimum height stays at 320 px on iPhone.
+- After leaving the 20-second analyzed interval, displayed sample values become “—” (no extrapolation).
+- Summary metric cards keep their existing behavior; force formulas and CSV series are unchanged.
+
+### v1.6.3 再作成版の画面
+カードは名称と数値・単位の2行で表示します。系列選択ボタンも2行で、スマートフォンでの高さはv1.6.1と同じ30pxです。系列ボタンは横にスクロールできます。

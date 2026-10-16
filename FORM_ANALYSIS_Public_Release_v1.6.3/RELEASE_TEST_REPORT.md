@@ -43,3 +43,22 @@ The simplified sequential contact heuristic is present in the distributed JavaSc
 - Changed display label, right axis, title, and Japanese help terminology to 床反力.
 - Original 20-second maximum and per-foot force math unchanged.
 - JavaScript syntax and ZIP integrity checked. Browser UI tests passed at 390×844, 768×1024, 1024×768, and 1440×900 without JS errors or horizontal overflow. Synthetic SVG tests confirmed both overlaid curves appear on a single toggle ON and both disappear on OFF. Actual footage-based inference remains unverified.
+
+## v1.6.3 UI tests (synthetic data)
+- Chromium via inline HTML/CSS/JavaScript harness, 320×700, 390×844, 768×1024, 1440×900: **PASS**, no JavaScript page errors.
+- Current time 4.35 s maps to nearest sample and updates lead and drive resultant tabs to 45.7 N and 98.3 N: **PASS**.
+- Out-of-range playback position displays “—”, L/R values display within a shared tab, selected series toggle still works: **PASS**.
+- Mobile chart height >=320 px, minimum series tab width >=106 px, tab horizontal overflow without squeezing the SVG: **PASS**.
+- Full 20-second video analysis with real MediaPipe and Safari device: **NOT RETESTED**.
+
+### v1.6.3 再作成版の確認項目
+- 2行表示の系列ボタン／指標カード（3行目の補足説明を非表示）
+- 系列ボタン高さはPC 37px／幅767px以下 30px
+- 解析の実行結果は変更せず、動画シーク位置の現在値表示を維持
+
+**再作成版のブラウザ静的UI検証（模擬表示）**
+- 320 / 390 / 768 / 1440px ビューポートで系列ボタン領域の高さを計測：30 / 30 / 37 / 37px。
+- 320px・390pxでグラフ領域の高さ320px、ページ横はみ出しなし、系列ボタンのみ横スクロール。
+- 動的DOM検証：6系列の系列ボタン生成、補足説明の3行目削除、模擬現在値「2.7 N」「12.3 N」を再生時点として反映。
+- JavaScript構文チェック通過、ZIP整合性・SHA256照合通過予定。
+- 実動画によるMediaPipe動作確認とiPhone Safari実機検証は未実施。

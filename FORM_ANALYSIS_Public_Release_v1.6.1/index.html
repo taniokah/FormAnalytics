@@ -7,15 +7,15 @@
 <meta content="#f4f7f6" name="theme-color"/>
 <link href="./manifest.webmanifest" rel="manifest"/>
 <meta content="FORM ANALYSIS 公開プレビュー｜動画から姿勢・並進速度・全身参考支持反力を端末内で計算" name="description"/>
-<title>FORM ANALYSIS — Public Preview v1.5</title>
-<link href="./css/public-v1.5.css" rel="stylesheet"/>
+<title>FORM ANALYSIS — Public Preview v1.6.1</title>
+<link href="./css/public-v1.6.1.css" rel="stylesheet"/>
 <link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%230c2936'/%3E%3Cpath d='M9 30V10h22' stroke='%23c7f36b' stroke-width='6' fill='none'/%3E%3C/svg%3E" rel="icon"/>
 </head>
 <body>
 <div class="app" id="app">
 <section aria-label="利用ガイド" class="welcome" id="welcome">
 <div class="guide-shell">
-<div class="guide-mark"><span class="guide-logo">F</span><span>FORM ANALYSIS</span><span class="guide-version">公開版 v1.5</span></div>
+<div class="guide-mark"><span class="guide-logo">F</span><span>FORM ANALYSIS</span><span class="guide-version">公開版 v1.6.1</span></div>
 <div class="guide-heading"><span class="guide-eyebrow">かんたん3ステップ</span><h1>動画を選んで、フォームを解析</h1>
 <p>普段のカメラアプリで撮影した投球動画を選ぶだけ。解析はスマートフォン・タブレット内で実行します。</p></div>
 <div aria-label="操作手順" class="guide-steps">
@@ -66,14 +66,14 @@
 <section aria-label="解析結果" class="results">
 <div aria-label="解析指標のページ" class="page-switch" id="pageSwitch" role="tablist">
 <button aria-selected="true" class="selected" data-page="speed" role="tab">01　並進速度</button>
-<button aria-selected="false" data-page="forces" role="tab">02　地面反力</button>
+<button aria-selected="false" data-page="forces" role="tab">02　床反力</button>
 <button aria-selected="false" data-page="dynamics" role="tab">03　力学・距離</button>
 
 
 </div>
 <div aria-live="polite" class="metrics" id="metrics"></div>
 <section aria-label="時系列グラフ" class="chart-card card">
-<div class="chart-top"><b id="chartTitle">速度の推移</b><div class="chart-actions"><label class="force-toggle" title="参考支持反力（鉛直合計）を右軸に重ねる"><input checked="" id="forceLayerToggle" type="checkbox"/><span>合計反力 N</span></label><span id="modeNote">未解析</span><button aria-label="現在の動画フレームをPNGで保存" id="exportPng" title="現在の表示状態をPNG保存">↓ PNG</button><button aria-label="CSV形式で保存" id="exportCsv" title="CSV形式で保存">↓ CSV</button></div></div>
+<div class="chart-top"><b id="chartTitle">速度の推移</b><div class="chart-actions"><label class="force-toggle" title="踏込足 F1 と軸足 F2 の床反力（各合力）を同じグラフに重ねて表示"><input checked="" id="forceLayerToggle" type="checkbox" aria-label="踏込足と軸足の床反力（合力）を同時表示"/><span>床反力 N</span></label><span id="modeNote">未解析</span><button aria-label="現在の動画フレームをPNGで保存" id="exportPng" title="現在の表示状態をPNG保存">↓ PNG</button><button aria-label="CSV形式で保存" id="exportCsv" title="CSV形式で保存">↓ CSV</button></div></div>
 <div aria-label="グラフに表示するデータ（複数選択可）" class="tabs" id="tabs" role="group"></div>
 <svg aria-label="動画の時刻に同期する解析グラフ" id="plot" preserveAspectRatio="xMidYMid meet" role="img" viewBox="0 0 520 170"></svg>
 
@@ -119,7 +119,7 @@
 </dialog>
 <dialog class="dialog" id="helpDialog">
 <form method="dialog">
-<div class="dialog-head"><h2>FORM ANALYSIS 公開プレビュー v1.5</h2><button aria-label="閉じる" value="close">✕</button></div>
+<div class="dialog-head"><h2>FORM ANALYSIS 公開プレビュー v1.6.1</h2><button aria-label="閉じる" value="close">✕</button></div>
 
 
 
@@ -130,12 +130,12 @@
 
 
 
-<p>動画画面の「動画 ON/OFF」で映像、「骨格 ON/OFF」で骨格線・関節点、「反力矢印 ON/OFF」で参考反力の模式矢印をそれぞれ切り替えられます。骨格表示は解析後に利用できます。非表示にしても解析済みデータは消えません。</p><p>使い方：スマートフォンのカメラで撮影した動画を読み込み、身長と体重、解析範囲を指定して「解析」を選択してください。すべての計算は端末内で実行します。</p><p>01 並進速度：左右肩・肘・手首・人差し指先、胸郭中央、骨盤中央の2D位置を追跡します。重心に代わる「骨盤中心速度」は骨盤中点の並進速度であり、全身の質量重心ではありません。</p><p>02 地面反力（参考表示）：骨盤中心の2D加速度からFx=m ax、Fz=m(g+az)で全身反力を概算し、簡易的な接地・離地候補に基づき、支持点の相対配置と簡易重心の水平加速度で左右に分配します。各足の水平反力は重心向きが正です。各足の合力・鉛直・水平の6系列を表示します。これは物理法則の簡易デモであり、実際の脚別床反力の実測ではありません。接地候補は踏込離地→踏込接地→軸足離地→軸足再接地の順で推定し、十分な証拠がなければ検出しません。動画上の矢印は各足から骨盤中点へ向けた模式表示であり、実際の反力ベクトル方向ではありません。1 BWで骨盤中心に達する縮尺です。</p><p>03 力学・距離：ストライドは両足首の投球方向の画面内距離、投球腕の手首移動量は解析開始位置からの水平変位の絶対値です。エネルギーは骨盤中心速度の仮の並進エネルギーです。ボールリリース時刻・距離は推定しません。</p><p>距離は身長と初期画像上の人物の高さからの概算です。前後への移動やカメラの角度が変わると計測誤差が発生します。実測の地面反力ではなく、足部移動による接地候補と簡易重心・支持点の配置に基づく参考情報です。医療判断や競技評価の断定に使用しないでください。</p><p>MediaPipeとWASM／モデルはこのサイトの /vendor/ フォルダから提供され、端末で実行されます。通常の動画データはサーバーへアップロードしません。初回にサイトを読み込んだ後、Service Workerで資産をキャッシュできます。</p><p class="license-note">このデモの商用利用は有償です。業務利用、有料指導などには提供者との事前ライセンス契約が必要です。使用するMediaPipe等の第三者ソフトウェアのライセンスは各提供者の条件に従います。</p><p class="subtle" id="statusDetails">モデル未読み込み</p>
+<p>動画画面の「動画 ON/OFF」で映像、「骨格 ON/OFF」で骨格線・関節点、「反力矢印 ON/OFF」で参考反力の模式矢印をそれぞれ切り替えられます。骨格表示は解析後に利用できます。非表示にしても解析済みデータは消えません。</p><p>使い方：スマートフォンのカメラで撮影した動画を読み込み、身長と体重、解析範囲を指定して「解析」を選択してください。すべての計算は端末内で実行します。</p><p>01 並進速度：左右肩・肘・手首・人差し指先、胸郭中央、骨盤中央の2D位置を追跡します。重心に代わる「骨盤中心速度」は骨盤中点の並進速度であり、全身の質量重心ではありません。</p><p>02 床反力（参考表示）：骨盤中心の2D加速度からFx=m ax、Fz=m(g+az)で全身反力を概算し、簡易的な接地・離地候補に基づき、支持点の相対配置と簡易重心の水平加速度で左右に分配します。各足の水平反力は重心向きが正です。各足の合力・鉛直・水平の6系列を表示します。これは物理法則の簡易デモであり、実際の脚別床反力の実測ではありません。接地候補は踏込離地→踏込接地→軸足離地→軸足再接地の順で推定し、十分な証拠がなければ検出しません。動画上の矢印は各足から骨盤中点へ向けた模式表示であり、実際の反力ベクトル方向ではありません。1 BWで骨盤中心に達する縮尺です。</p><p>03 力学・距離：ストライドは両足首の投球方向の画面内距離、投球腕の手首移動量は解析開始位置からの水平変位の絶対値です。エネルギーは骨盤中心速度の仮の並進エネルギーです。ボールリリース時刻・距離は推定しません。</p><p>距離は身長と初期画像上の人物の高さからの概算です。前後への移動やカメラの角度が変わると計測誤差が発生します。実測の床反力ではなく、足部移動による接地候補と簡易重心・支持点の配置に基づく参考情報です。医療判断や競技評価の断定に使用しないでください。</p><p>MediaPipeとWASM／モデルはこのサイトの /vendor/ フォルダから提供され、端末で実行されます。通常の動画データはサーバーへアップロードしません。初回にサイトを読み込んだ後、Service Workerで資産をキャッシュできます。</p><p class="license-note">このデモの商用利用は有償です。業務利用、有料指導などには提供者との事前ライセンス契約が必要です。使用するMediaPipe等の第三者ソフトウェアのライセンスは各提供者の条件に従います。</p><p class="subtle" id="statusDetails">モデル未読み込み</p>
 <div class="dialog-actions"><button class="primary" value="close">閉じる</button></div>
 </form>
 </dialog>
 <div aria-live="polite" class="actionbar transient" id="actionbar" role="status"><span id="message">画面起動中…</span><button hidden="" id="runAnalysis">解析開始</button><button hidden="" id="cancelAnalysis">中止</button><button aria-label="通知を閉じる" id="dismissMessage" title="通知を閉じる" type="button">✕</button></div>
 <input accept="video/*,.mp4,.mov,.m4v,.webm" aria-label="動画ファイルを選択" class="native-file-input" id="videoFile" type="file"/>
-<script defer="" src="./js/public-v1.5.js"></script>
+<script defer="" src="./js/public-v1.6.1.js"></script>
 </body>
 </html>

@@ -30,3 +30,16 @@ The simplified sequential contact heuristic is present in the distributed JavaSc
 - 10/15/30/60 samples per second, up to 1201 samples for 20 seconds at 60 samples/s.
 - Responsive chart coordinates and in-bounds axes; graph scales across the full analysis interval.
 - Same-origin offline MediaPipe WASM and Heavy/Full pose assets retained.
+
+
+## v1.6 regression / static validation
+- Chart overlay now references `driveResultant` and `leadResultant`; one toggle controls both.
+- Both use the same right-hand axis (N). Mathematical estimator is unchanged.
+- JavaScript syntax, ZIP structure and static source assertions checked.
+- Browser end-to-end 20-second video analysis not executed.
+
+## v1.6.1 verification
+- Single force toggle controls two SVG graph paths, driveResultant and leadResultant.
+- Changed display label, right axis, title, and Japanese help terminology to 床反力.
+- Original 20-second maximum and per-foot force math unchanged.
+- JavaScript syntax and ZIP integrity checked. Browser UI tests passed at 390×844, 768×1024, 1024×768, and 1440×900 without JS errors or horizontal overflow. Synthetic SVG tests confirmed both overlaid curves appear on a single toggle ON and both disappear on OFF. Actual footage-based inference remains unverified.

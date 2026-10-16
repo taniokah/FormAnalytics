@@ -1,4 +1,4 @@
-# FORM ANALYSIS Public Preview v1.4 — verification
+# FORM ANALYSIS Public Preview v1.5 — verification
 
 ## Implemented changes
 
@@ -24,3 +24,9 @@
 ## Publication caution
 
 The simplified sequential contact heuristic is present in the distributed JavaScript and **will be disclosed publicly if this ZIP is published**. Confirm whether any related patent claims remain unfiled, and have university IP counsel review before deployment. This is a reference sports-analysis visualization, not a validated measurement device.
+
+## v1.5 changes
+- Analyze up to 20 seconds from the specified start time; the default end time 0 means up to 20 seconds or the end of the video.
+- 10/15/30/60 samples per second, up to 1201 samples for 20 seconds at 60 samples/s.
+- Responsive chart coordinates and in-bounds axes; graph scales across the full analysis interval.
+- Same-origin offline MediaPipe WASM and Heavy/Full pose assets retained.

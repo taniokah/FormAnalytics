@@ -7,15 +7,15 @@
 <meta content="#f4f7f6" name="theme-color"/>
 <link href="./manifest.webmanifest" rel="manifest"/>
 <meta content="FORM ANALYSIS 公開プレビュー｜動画から姿勢・並進速度・全身参考支持反力を端末内で計算" name="description"/>
-<title>FORM ANALYSIS — Public Preview v1.4</title>
-<link href="./css/public-v1.4.css" rel="stylesheet"/>
+<title>FORM ANALYSIS — Public Preview v1.5</title>
+<link href="./css/public-v1.5.css" rel="stylesheet"/>
 <link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%230c2936'/%3E%3Cpath d='M9 30V10h22' stroke='%23c7f36b' stroke-width='6' fill='none'/%3E%3C/svg%3E" rel="icon"/>
 </head>
 <body>
 <div class="app" id="app">
 <section aria-label="利用ガイド" class="welcome" id="welcome">
 <div class="guide-shell">
-<div class="guide-mark"><span class="guide-logo">F</span><span>FORM ANALYSIS</span><span class="guide-version">公開版 v1.4</span></div>
+<div class="guide-mark"><span class="guide-logo">F</span><span>FORM ANALYSIS</span><span class="guide-version">公開版 v1.5</span></div>
 <div class="guide-heading"><span class="guide-eyebrow">かんたん3ステップ</span><h1>動画を選んで、フォームを解析</h1>
 <p>普段のカメラアプリで撮影した投球動画を選ぶだけ。解析はスマートフォン・タブレット内で実行します。</p></div>
 <div aria-label="操作手順" class="guide-steps">
@@ -75,7 +75,7 @@
 <section aria-label="時系列グラフ" class="chart-card card">
 <div class="chart-top"><b id="chartTitle">速度の推移</b><div class="chart-actions"><label class="force-toggle" title="参考支持反力（鉛直合計）を右軸に重ねる"><input checked="" id="forceLayerToggle" type="checkbox"/><span>合計反力 N</span></label><span id="modeNote">未解析</span><button aria-label="現在の動画フレームをPNGで保存" id="exportPng" title="現在の表示状態をPNG保存">↓ PNG</button><button aria-label="CSV形式で保存" id="exportCsv" title="CSV形式で保存">↓ CSV</button></div></div>
 <div aria-label="グラフに表示するデータ（複数選択可）" class="tabs" id="tabs" role="group"></div>
-<svg aria-label="動画の時刻に同期する解析グラフ" id="plot" preserveaspectratio="none" role="img" viewbox="0 0 520 170"></svg>
+<svg aria-label="動画の時刻に同期する解析グラフ" id="plot" preserveAspectRatio="xMidYMid meet" role="img" viewBox="0 0 520 170"></svg>
 
 <div class="legend" id="legend"></div>
 </section>
@@ -104,7 +104,7 @@
 <label>関節の左右識別<select id="mirrorSidesInput"><option value="no">通常（推奨）</option><option value="yes">左右入替（鏡像や認識誤りの場合）</option></select></label>
 <label>姿勢推定モデル<select id="modelInput"><option value="heavy">Heavy（精度優先）</option><option value="full">Full（速度優先）</option></select></label>
 <label>解析開始時刻（秒）<input id="startTimeInput" max="999" min="0" step="0.1" type="number" value="0"/></label>
-<label>解析終了時刻（秒・0＝自動）<input id="endTimeInput" max="999" min="0" step="0.1" type="number" value="0"/></label>
+<label>解析終了時刻（秒・0＝開始から最大20秒）<input id="endTimeInput" max="999" min="0" step="0.1" type="number" value="0"/></label>
 
 
 
@@ -119,7 +119,7 @@
 </dialog>
 <dialog class="dialog" id="helpDialog">
 <form method="dialog">
-<div class="dialog-head"><h2>FORM ANALYSIS 公開プレビュー v1.4</h2><button aria-label="閉じる" value="close">✕</button></div>
+<div class="dialog-head"><h2>FORM ANALYSIS 公開プレビュー v1.5</h2><button aria-label="閉じる" value="close">✕</button></div>
 
 
 
@@ -136,6 +136,6 @@
 </dialog>
 <div aria-live="polite" class="actionbar transient" id="actionbar" role="status"><span id="message">画面起動中…</span><button hidden="" id="runAnalysis">解析開始</button><button hidden="" id="cancelAnalysis">中止</button><button aria-label="通知を閉じる" id="dismissMessage" title="通知を閉じる" type="button">✕</button></div>
 <input accept="video/*,.mp4,.mov,.m4v,.webm" aria-label="動画ファイルを選択" class="native-file-input" id="videoFile" type="file"/>
-<script defer="" src="./js/public-v1.4.js"></script>
+<script defer="" src="./js/public-v1.5.js"></script>
 </body>
 </html>

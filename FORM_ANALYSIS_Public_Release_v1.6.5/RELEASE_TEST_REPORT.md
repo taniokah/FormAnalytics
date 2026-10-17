@@ -108,12 +108,11 @@ The simplified sequential contact heuristic is present in the distributed JavaSc
 - 既存の簡易接地・離地判定および支持反力配分の10項目単体テスト：成功（踏込・軸足の離地／接地、短時間ノイズ、踵のみ上昇、左右入替等）。
 - 実機iPhone Safariでの読み込み、および大容量MOV/HEVCの読み込みは未検証。ファイル選択画面が閉じることはiOS標準動作であり、メモリ不足によるタブ再起動や非対応コーデックは待機時間延長だけでは防げません。
 
+## iPhone MOV import rework
+- JavaScript syntax / browser synthetic load / local MOV tests: see validation output.
+- iPhone Safari physical device and original IMG_8265.mov: not available for validation.
 
-## 同一v1.6.5：両脚高低差に基づく下方脚単独支持ルール
-
-- 検証: `node --check js/public-v1.6.5.js` 成功。
-- 既存の左右足高低差・離地・接地判定回帰テスト10件、および追加5件の計15件成功。
-- 追加検証: 踏込足が高いときF1の水平／鉛直／合力が0で軸足の接地フラグが1、逆の場合F2が0で踏込足の接地フラグが1。
-- 追加検証: 足首位置が矛盾しても踵＋つま先がそろって上にある側は非接地。段階的な動作イベントが矛盾しても高低差を優先。
-- 追加検証: 有意な高低差がある間、接地フラグの合計は1。踵のみ上がるケースでは誤って離地扱いしない。
-- 動画読み込み関連のJavaScript関数は直前のiOS修正版から変更していない。実iPhoneでの動画取り込みと実測床反力の正確性は未検証。
+- Automated browser: locally generated MOV H.264 (2.5 s) metadata imported successfully in Chromium.
+- Same file reselected successfully.
+- Synthetic late metadata (only when preview visible) imported successfully.
+- JavaScript console errors in these tests: 0.

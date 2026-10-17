@@ -27,11 +27,11 @@
 - 注意：ファイル選択シートが閉じるのは選択完了時のiOS標準動作です。OSによるタブ再読み込みや非対応コーデックに対してアプリ側の待機時間だけでの解決は保証しません。
 - 読み込み中にSafariがページを再読み込みした場合、同一セッション内の再起動後に原因切り分け用のメッセージを表示します（Fileデータや名前は保存しません）。
 
-
-## 両脚の高低差による片脚支持を優先（v1.6.5のまま）
-- 同じ時刻の左右足について踵・つま先の両方が明確に高い側を離地候補、低い側だけを接地候補と判定する。踏込足が高ければF1を0 N、軸足が高ければF2を0 Nにする。
-- 高低差の判定は、既存の離地→接地という動作順序ヒューリスティックより優先し、逆の判定が競合しても高低差を優先する。
-- 足首の高さは判定を否定する必須条件から除外。足首ランドマークが揺れても、両足の踵とつま先の高さ差から判定できる。
-- 閾値（約7.5 cm相当）と3フレーム連続確認、復帰時のヒステリシス（約4.2 cm相当）は維持。高さは単眼画像上の推定値で、マウンド・段差・遠近による誤判定の可能性がある。
-- F1/F2の荷重配分、床反力グラフ、矢印、接地フラグ、イベント、CSVは同じ接地・離地判定を参照する。
-- iPhone Safariの動画読み込み処理は直前のv1.6.5修正版から一切変更しない。
+## iPhone MOV reading regression mitigation (2026-10-17)
+- Restore v1.6.1 automatic media preloading (auto rather than metadata).
+- Show the video viewer while waiting for Safari metadata, avoiding a display:none media ancestor.
+- Preserve up to 180 seconds of waiting; show a persistent loading state and allow users to tap ▶ to initiate native playback.
+- Log file-read health and media readyState/networkState if loading fails.
+- Reset file input on change so the exact same MOV can be selected again.
+- Analysis remains disabled until metadata is available.
+- No changes to pose estimation, load partitioning, contact heuristics, or charts.

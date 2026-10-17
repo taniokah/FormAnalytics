@@ -116,3 +116,14 @@ The simplified sequential contact heuristic is present in the distributed JavaSc
 - Same file reselected successfully.
 - Synthetic late metadata (only when preview visible) imported successfully.
 - JavaScript console errors in these tests: 0.
+
+## v1.6.5 horizontal inward-positive display regression
+- F1 / F2 horizontal display columns now show the inward-positive *reference magnitude* consistent with the preview arrow convention (foot to pelvis), including when the stored pitch-direction component is negative.
+- Signed pitch-direction components, their summed balance, ground-contact gating, the force magnitudes, and video loading remain unchanged.
+- Caveat: actual sign of per-foot shear is not independently estimated by this public model; displayed positive numbers do not establish actual inward-directed ground force.
+
+### Local automated checks for inward-positive display revision
+- `node --check js/public-v1.6.5.js`: PASS.
+- 36 synthetic allocator cases (two video travel directions × three net horizontal accelerations × two projected foot layouts × three contact phases): PASS. Both display series nonnegative; flight-phase load = 0; resultant magnitudes invariant; signed `*HorizontalWorld` fields still sum to `forceHorizontal`.
+- Vendor model/WASM files identical to the immediate preceding iOS MOV loader release: PASS.
+- Safari on-device and measured foot-direction accuracy: NOT VERIFIED.

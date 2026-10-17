@@ -12,7 +12,7 @@ const $=id=>document.getElementById(id);
 const video=$('video'), canvas=$('overlay'),fileInput=$('videoFile');
 const G=9.80665, KEY_MIN=.30, MAX_ANALYSIS_SECONDS=20;
 const COLORS={leadResultant:'#f39b33',driveResultant:'#499ff4',leadVertical:'#df851b',driveVertical:'#317fd4',leadHorizontal:'#b76b17',driveHorizontal:'#225faf',pelvisSpeed:'#078d79',thoraxSpeed:'#3286d3',shoulderL:'#ac62d2',shoulderR:'#ea9550',elbowL:'#2377b8',elbowR:'#d3637a',wristL:'#00a09a',wristR:'#d28d39',handTipL:'#9d59cb',handTipR:'#db725c',forceTotal:'#2a7398',forceVertical:'#ed9636',forceHorizontal:'#9c60d5',stride:'#0b9299',wristTravel:'#267aa2',energy:'#8f68ce'};
-const LABELS={leadResultant:'踏込足 床反力（合力）',driveResultant:'軸足 床反力（合力）',leadVertical:'踏込足 鉛直（参考配分）',driveVertical:'軸足 鉛直（参考配分）',leadHorizontal:'踏込足 水平（重心向き＋）',driveHorizontal:'軸足 水平（重心向き＋）',pelvisSpeed:'骨盤中心速度',thoraxSpeed:'胸郭中心速度',shoulderL:'左肩',shoulderR:'右肩',elbowL:'左肘',elbowR:'右肘',wristL:'左手首',wristR:'右手首',handTipL:'左手先（人差し指）',handTipR:'右手先（人差し指）',forceTotal:'全身参考合力',forceVertical:'参考鉛直反力',forceHorizontal:'参考水平反力',stride:'足首間前後距離',wristTravel:'投球手首の水平移動量',energy:'骨盤中心の参考エネルギー'};
+const LABELS={leadResultant:'踏込足 床反力（合力）',driveResultant:'軸足 床反力（合力）',leadVertical:'踏込足 鉛直（参考配分）',driveVertical:'軸足 鉛直（参考配分）',leadHorizontal:'踏込足 水平（骨盤中心向き＋・参考）',driveHorizontal:'軸足 水平（骨盤中心向き＋・参考）',pelvisSpeed:'骨盤中心速度',thoraxSpeed:'胸郭中心速度',shoulderL:'左肩',shoulderR:'右肩',elbowL:'左肘',elbowR:'右肘',wristL:'左手首',wristR:'右手首',handTipL:'左手先（人差し指）',handTipR:'右手先（人差し指）',forceTotal:'全身参考合力',forceVertical:'参考鉛直反力',forceHorizontal:'参考水平反力',stride:'足首間前後距離',wristTravel:'投球手首の水平移動量',energy:'骨盤中心の参考エネルギー'};
 const PAGE={speed:{cards:[
  {id:'pelvis',name:'骨盤中心速度',keys:['pelvisSpeed'],unit:'m/s',icon:'⌖',hint:'左右股関節中点（全身重心ではありません）'},
  {id:'thorax',name:'胸郭中心速度',keys:['thoraxSpeed'],unit:'m/s',icon:'⌁',hint:'左右肩中点'},
@@ -25,8 +25,8 @@ const PAGE={speed:{cards:[
  {id:'drive-resultant',name:'軸足 合力',tab:'軸足 合力',keys:['driveResultant'],unit:'N',icon:'↗',hint:'接地候補と支持点配分による参考値'},
  {id:'lead-vertical',name:'踏込足 鉛直反力',tab:'踏込 鉛直',keys:['leadVertical'],unit:'N',icon:'↑',hint:'接地候補と支持点配分による参考値'},
  {id:'drive-vertical',name:'軸足 鉛直反力',tab:'軸足 鉛直',keys:['driveVertical'],unit:'N',icon:'↑',hint:'接地候補と支持点配分による参考値'},
- {id:'lead-horizontal',name:'踏込足 水平反力',tab:'踏込 水平',keys:['leadHorizontal'],unit:'N',icon:'↔',hint:'簡易重心向きを正・参考値'},
- {id:'drive-horizontal',name:'軸足 水平反力',tab:'軸足 水平',keys:['driveHorizontal'],unit:'N',icon:'↔',hint:'簡易重心向きを正・参考値'}
+ {id:'lead-horizontal',name:'踏込足 水平反力',tab:'踏込 水平',keys:['leadHorizontal'],unit:'N',icon:'↔',hint:'骨盤中心向き＋の参考表示（方向は独立推定していません）'},
+ {id:'drive-horizontal',name:'軸足 水平反力',tab:'軸足 水平',keys:['driveHorizontal'],unit:'N',icon:'↔',hint:'骨盤中心向き＋の参考表示（方向は独立推定していません）'}
  ]},dynamics:{cards:[
  {id:'stride',name:'足首間前後距離',keys:['stride'],unit:'m',icon:'↔',hint:'画面内の左右足首間隔'},
  {id:'wristTravel',name:'投球手首の移動量',keys:['wristTravel'],unit:'m',icon:'⇢',hint:'開始フレームからの水平移動距離'},
@@ -261,13 +261,18 @@ function allocateFootForcesFiled({fzTotal,fxTotal,pelvis,leadFoot,driveFoot,scal
   share=Math.max(0,Math.min(1,share));
   const leadVertical=fzTotal*share,driveVertical=fzTotal-leadVertical;
   const leadHorizontalWorld=fxTotal*share,driveHorizontalWorld=fxTotal-leadHorizontalWorld;
-  // DISPLAY convention: positive means horizontal force points from that
-  // particular foot toward the simplified COM. Physical world components
-  // are preserved separately for balance and audit, and may have opposite
-  // signs for the lead/drive foot. The magnitude is unchanged.
-  const towardLead=Math.sign(pX-leadX),towardDrive=Math.sign(pX-driveX);
-  const leadHorizontal=contactPhase===1?0:(towardLead?leadHorizontalWorld*towardLead:null);
-  const driveHorizontal=contactPhase===3?0:(towardDrive?driveHorizontalWorld*towardDrive:null);
+  // DISPLAY convention (public, simplified visualization): the positive
+  // horizontal direction for EACH foot is from its support point TOWARD the
+  // pelvis midpoint, matching the displayed support-to-pelvis arrows.
+  // This public model estimates a shared net horizontal force, then divides
+  // it by load share; it does NOT independently identify the actual direction
+  // of each foot's tangential reaction. Therefore show each foot's horizontal
+  // magnitude as an INWARD-POSITIVE *reference* value rather than implying
+  // that its shared world-direction estimate determines a foot's local sign.
+  // Preserve signed pitch-direction components (*HorizontalWorld) separately
+  // for force-balance auditing; do not change the estimated magnitudes.
+  const leadHorizontal=contactPhase===1?0:Math.abs(leadHorizontalWorld);
+  const driveHorizontal=contactPhase===3?0:Math.abs(driveHorizontalWorld);
   return {leadVertical,driveVertical,leadHorizontal,driveHorizontal,
     leadHorizontalWorld,driveHorizontalWorld,
     leadResultant:Math.hypot(leadVertical,leadHorizontalWorld),
@@ -470,7 +475,7 @@ function buildCards(){
     tab.append(tabLabel,tabValue);
     tab.onclick=()=>toggleCard(c.id);$('tabs').append(tab);
   }
-  $('pageHelp').textContent=state.page==='forces'?'【参考推定】足部の動きと左右足の高さ差（足首・踵・つま先）から接地候補を推測し、支持点・骨盤中点・加速度から床反力を配分。段差・遠近差では誤判定の可能性があります。▲離地、▼接地（候補）。':state.page==='dynamics'?'手首の移動量はリリース位置ではありません。距離・エネルギーは画像内の簡易推定です。':'速度は画像内2D位置の変化から求めています。骨盤中点は全身重心ではありません。';
+  $('pageHelp').textContent=state.page==='forces'?'【参考推定】足部動作と左右足の高さ差から接地候補を推測し、支持点・骨盤中心・加速度から床反力を配分。脚別水平値は骨盤中心向きを正とする参考表示で、各足の実際の作用方向は独立には推定していません。▲離地、▼接地（候補）。':state.page==='dynamics'?'手首の移動量はリリース位置ではありません。距離・エネルギーは画像内の簡易推定です。':'速度は画像内2D位置の変化から求めています。骨盤中点は全身重心ではありません。';
   $('forceLayerToggle').closest('label').hidden=state.page==='forces';
 }
 const svgNode=(name,props={},str)=>{const n=document.createElementNS('http://www.w3.org/2000/svg',name);Object.entries(props).forEach(([k,v])=>n.setAttribute(k,v));if(str!==undefined)n.textContent=str;return n;};
@@ -858,7 +863,7 @@ async function snapshot(){
 }
 function exportCsv(){if(!stateReady()){notify('先に解析を実行してください');return;}
   const keys=['t','contactPhase','contactSource','footHeightDiffM','leadContact','driveContact','pelvisSpeed','thoraxSpeed','shoulderL','shoulderR','elbowL','elbowR','wristL','wristR','handTipL','handTipR','forceTotal','forceVertical','forceHorizontal','leadResultant','driveResultant','leadVertical','driveVertical','leadHorizontal','driveHorizontal','leadHorizontalWorld','driveHorizontalWorld','stride','wristTravel','energy','shareLead'];
-  const lines=['# FORM ANALYSIS Public Preview v1.6.5','# Simple single-pass, 2D hip-center proxy: NOT anatomical CoM','# Filed support-point load partition: projected pelvis-center and acceleration, adjusted for candidate foot contact; NOT measured foot GRF',`# height_cm=${state.config.height} weight_kg=${state.config.weight} sex(record-only)=${state.config.sex}`,'# Contact candidates: sequential foot motion + relative bilateral toe/heel/ankle height difference, 3 stable observations; 2D unvalidated heuristic', '# footHeightDiffM: positive means lead foot appears higher than drive; camera perspective, steps and mounds can misclassify support', '# leadHorizontal/driveHorizontal: positive toward pelvis midpoint; *HorizontalWorld signed positive toward pitching direction',`# contact_assumption=${state.analysis.contactAssumption}`,...state.analysis.events.map(e=>`# event=${e.foot}_${e.type},time_s=${e.t.toFixed(3)},quality=candidate`),keys.join(',')];
+  const lines=['# FORM ANALYSIS Public Preview v1.6.5','# Simple single-pass, 2D hip-center proxy: NOT anatomical CoM','# Filed support-point load partition: projected pelvis-center and acceleration, adjusted for candidate foot contact; NOT measured foot GRF',`# height_cm=${state.config.height} weight_kg=${state.config.weight} sex(record-only)=${state.config.sex}`,'# Contact candidates: sequential foot motion + relative bilateral toe/heel/ankle height difference, 3 stable observations; 2D unvalidated heuristic', '# footHeightDiffM: positive means lead foot appears higher than drive; camera perspective, steps and mounds can misclassify support', '# leadHorizontal/driveHorizontal: inward-positive reference magnitudes (foot -> pelvis); actual per-foot horizontal direction NOT independently estimated', '# *HorizontalWorld: signed pitch-direction allocation, sums to forceHorizontal (not the inward-display convention)',`# contact_assumption=${state.analysis.contactAssumption}`,...state.analysis.events.map(e=>`# event=${e.foot}_${e.type},time_s=${e.t.toFixed(3)},quality=candidate`),keys.join(',')];
   for(const row of state.analysis.samples)lines.push(keys.map(k=>
     Number.isFinite(row[k])?row[k].toFixed(5):typeof row[k]==='string'?row[k]:'').join(','));
   const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='FORM_ANALYSIS_PUBLIC_v1.6.5.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notify('CSVを保存しました');

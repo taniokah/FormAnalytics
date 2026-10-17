@@ -35,3 +35,10 @@
 - Reset file input on change so the exact same MOV can be selected again.
 - Analysis remains disabled until metadata is available.
 - No changes to pose estimation, load partitioning, contact heuristics, or charts.
+
+## 脚別水平床反力の符号表示統一（v1.6.5 同一バージョン再修正）
+- 軸足 F2 と踏込足 F1 の水平床反力表示は、それぞれの足部から骨盤中心へ向かう向きを正として統一。
+- 従来の共通進行方向配分から付与された負符号を、プレビューの足→骨盤中心矢印の表示方向に合わせて変更。脚別水平表示値は内向き正の参考大きさ（非負）とする。
+- 公開版の簡易モデルは、個々の足の水平反力ベクトルの作用方向を独立推定しない。実測の向きや外向き反力の有無を示すものではない。
+- 従来の進行方向基準の符号付き成分 leadHorizontalWorld / driveHorizontalWorld およびその合計 forceHorizontal は変更せず、CSVに維持。
+- 脚別の鉛直成分・合力の大きさ・接地候補・動画読込・グラフUIは変更なし。

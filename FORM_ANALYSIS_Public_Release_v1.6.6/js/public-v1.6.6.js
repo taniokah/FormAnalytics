@@ -603,6 +603,67 @@ function updateVideoLayers(){
   arrowButton.setAttribute('aria-pressed',String(state.showArrows));
   arrowButton.setAttribute('aria-label',state.showArrows?'反力矢印を非表示にする':'反力矢印を表示する');
 }
+// Face landmarks 0-10 are already returned by MediaPipe Pose Landmarker.
+// This is a schematic 2D head contour, not a facial mesh or anatomical measurement.
+// Each marker and segment is drawn only when its own landmarks pass lookup().
+function drawHeadOverlay(ctx, position, dpr){
+  const p=Array.from({length:11},(_,i)=>position(i));
+  const face=p.map((v,i)=>({v,i})).filter(q=>q.v);
+  const line=(a,b)=>{
+    if(!p[a]||!p[b])return;
+    ctx.beginPath();ctx.moveTo(p[a].x,p[a].y);ctx.lineTo(p[b].x,p[b].y);ctx.stroke();
+  };
+  ctx.save();
+  ctx.strokeStyle='rgba(193,255,157,.8)';
+  ctx.lineWidth=Math.max(1,1.35*dpr);
+  ctx.lineCap='round';ctx.lineJoin='round';
+  // Both frontal and profile faces: fit a small oval around visible features.
+  // Use ears to anchor the width if available; otherwise use visible eyes/nose/mouth.
+  const earL=p[7],earR=p[8],nose=p[0];
+  if(face.length>=3&&(nose||p[2]||p[5])&&(earL||earR||p[9]||p[10])){
+    let cx,cy,rx,ry,rotation=0;
+    const pts=face.map(q=>q.v);
+    const xs=pts.map(q=>q.x),ys=pts.map(q=>q.y);
+    const minX=Math.min(...xs),maxX=Math.max(...xs);
+    const minY=Math.min(...ys),maxY=Math.max(...ys);
+    cx=(minX+maxX)/2;cy=(minY+maxY)/2;
+    const width=maxX-minX,height=maxY-minY;
+    rx=Math.max(width*.58,height*.7);
+    ry=Math.max(rx*1.13,height*.88);
+    if(earL&&earR){
+      const dx=earR.x-earL.x,dy=earR.y-earL.y;
+      const earSpan=Math.hypot(dx,dy);
+      if(earSpan>0){
+        cx=(earL.x+earR.x)/2;
+        cy=(earL.y+earR.y)/2-0.07*earSpan;
+        rx=Math.max(rx,earSpan*.53);
+        ry=Math.max(ry,rx*1.13);
+        rotation=Math.atan2(dy,dx);
+      }
+    }else if((earL||earR)&&nose){
+      const ear=earL||earR;
+      const span=Math.hypot(nose.x-ear.x,nose.y-ear.y);
+      cx=(ear.x+nose.x)/2;
+      cy=(ear.y+nose.y)/2-0.12*span;
+      rx=Math.max(rx,span*.75);
+      ry=Math.max(ry,rx*1.18);
+    }
+    const shL=position(11),shR=position(12);
+    const shoulderSpan=shL&&shR?Math.hypot(shR.x-shL.x,shR.y-shL.y):null;
+    // Suppress spurious head ovals from stray detections or extremely tiny heads.
+    if(rx>=3.5*dpr&&(!shoulderSpan||rx*2<=shoulderSpan*1.05)){
+      ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,rotation,0,2*Math.PI);ctx.stroke();
+    }
+  }
+  // Light facial skeleton, intentionally less prominent than the body skeleton.
+  for(const [a,b] of [[7,3],[3,2],[2,1],[1,0],[0,4],[4,5],[5,6],[6,8],[9,10]])line(a,b);
+  for(const {v,i} of face){
+    ctx.beginPath();ctx.arc(v.x,v.y,(i===0?2.8:2.05)*dpr,0,2*Math.PI);
+    ctx.fillStyle=i===0?'#d9ffad':'#a2f96b';ctx.fill();
+    ctx.strokeStyle='#0b3341';ctx.lineWidth=1.05*dpr;ctx.stroke();
+  }
+  ctx.restore();
+}
 function drawOverlay(){
   const r=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2),w=Math.max(1,Math.round(r.width*dpr)),h=Math.max(1,Math.round(r.height*dpr));
   if(canvas.width!==w)canvas.width=w;if(canvas.height!==h)canvas.height=h;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,w,h);
@@ -611,6 +672,7 @@ function drawOverlay(){
   const scale=Math.min(w/video.videoWidth,h/video.videoHeight),ww=video.videoWidth*scale,hh=video.videoHeight*scale,ox=(w-ww)/2,oy=(h-hh)/2;
   const position=i=>{const p=lookup(sample.pose,i);return p?{x:ox+p.x*ww,y:oy+p.y*hh}:null;};
   if(state.showPose){
+  drawHeadOverlay(ctx,position,dpr);
   const joins=[[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[27,31],[24,26],[26,28],[28,32]];
   ctx.strokeStyle='#b2f765';ctx.lineWidth=Math.max(2,2.1*dpr);
   for(const [a,b] of joins){const pa=position(a),pb=position(b);if(!pa||!pb)continue;ctx.beginPath();ctx.moveTo(pa.x,pa.y);ctx.lineTo(pb.x,pb.y);ctx.stroke();}

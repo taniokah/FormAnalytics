@@ -26,7 +26,7 @@ GitHub Pages configuration, deployment propagation, or browser caching may affec
 
 | Category | Description |
 | --- | --- |
-| Pose | Markerless 2D pose estimation using MediaPipe Pose Landmarker |
+| Pose | Markerless 2D pose estimation using MediaPipe Pose Landmarker Includes nose, eyes, ears and mouth landmarks with a schematic head outline. |
 | Velocity | Motion-derived estimates for pelvis/chest centers, shoulders, elbows, wrists, and fingertips |
 | GRF | Approximate per-foot ground reaction force magnitude and horizontal/vertical components for lead foot F1 and drive foot F2 |
 | Foot events | Heuristic **candidates** for foot contact and liftoff based on 2D foot motion and relative foot height |

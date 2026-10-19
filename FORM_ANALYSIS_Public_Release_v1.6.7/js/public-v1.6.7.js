@@ -700,6 +700,7 @@ function viewerIsFullscreen(){
 }
 function syncViewerFullscreen(){
   const active=viewerIsFullscreen(),button=$('expandButton');
+  document.documentElement.classList.toggle('viewer-fullscreen-active',active);
   button.textContent=active?'⤡':'⛶';
   button.setAttribute('aria-label',active?'通常表示に戻す':'全画面表示にする');
   button.setAttribute('title',active?'通常表示に戻す':'全画面表示にする');

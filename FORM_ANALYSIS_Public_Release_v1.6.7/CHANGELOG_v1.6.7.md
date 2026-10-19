@@ -8,3 +8,5 @@
 - 5フレーム平滑化、頭部ランドマーク（円なし）、床反力、従来の設定と解析処理を維持。
 - MediaRecorder/Canvas captureStreamに非対応のブラウザでは保存できない旨を表示。
 - iPhone実機Safariでの録画テストは未実施。
+
+- iPhone 13 mini: fullscreen player hides bottom app navigation, reserves bottom safe area and keeps recording/playback controls visible.

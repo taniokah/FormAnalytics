@@ -892,3 +892,45 @@ html.fullscreen-fallback-active body { overflow:hidden !important; }
  .record-toolbar:has(.record-link:not([hidden])) .record-status{display:none;}
  .record-toolbar .record-link{overflow:hidden;text-overflow:ellipsis;max-width:140px;}
 }
+
+/* iPhone small-screen fullscreen correction: keep player controls inside the visual viewport. */
+html.fullscreen-fallback-active .bottom-nav,
+html.viewer-fullscreen-active .bottom-nav {display:none !important;}
+html.fullscreen-fallback-active .app,
+html.viewer-fullscreen-active .app {grid-template-rows:minmax(0,1fr) !important; padding:0 !important;}
+html.fullscreen-fallback-active .workspace,
+html.viewer-fullscreen-active .workspace {overflow:visible !important;}
+.viewer.simulated-fullscreen,
+.viewer:fullscreen,
+.viewer:-webkit-full-screen {
+  top:0 !important;left:0 !important;right:0 !important;bottom:0 !important;
+  height:100dvh !important;max-height:100dvh !important;
+  grid-template-rows:minmax(0,1fr) 38px minmax(54px,auto) !important;
+  padding:env(safe-area-inset-top,0px) 0 max(12px,env(safe-area-inset-bottom,0px)) !important;
+  box-sizing:border-box !important;
+}
+.viewer.simulated-fullscreen .viewer-foot,
+.viewer:fullscreen .viewer-foot,
+.viewer:-webkit-full-screen .viewer-foot {display:none !important;}
+.viewer.simulated-fullscreen .record-toolbar,
+.viewer:fullscreen .record-toolbar,
+.viewer:-webkit-full-screen .record-toolbar {min-height:38px !important;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;}
+.viewer.simulated-fullscreen .transport,
+.viewer:fullscreen .transport,
+.viewer:-webkit-full-screen .transport {min-height:54px !important;padding-bottom:2px !important;}
+@media (max-width:767px) {
+  .viewer.simulated-fullscreen,
+  .viewer:fullscreen,
+  .viewer:-webkit-full-screen {
+    grid-template-rows:minmax(0,1fr) 38px 58px !important;
+  }
+  .viewer.simulated-fullscreen .transport,
+  .viewer:fullscreen .transport,
+  .viewer:-webkit-full-screen .transport {min-height:58px !important;gap:5px !important;}
+  .viewer.simulated-fullscreen .transport button,
+  .viewer:fullscreen .transport button,
+  .viewer:-webkit-full-screen .transport button {min-width:30px !important;min-height:40px !important;}
+  .viewer.simulated-fullscreen .record-toolbar,
+  .viewer:fullscreen .record-toolbar,
+  .viewer:-webkit-full-screen .record-toolbar {min-height:38px !important;}
+}

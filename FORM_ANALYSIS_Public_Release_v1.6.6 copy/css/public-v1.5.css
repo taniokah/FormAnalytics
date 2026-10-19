@@ -1,0 +1,485 @@
+:root {font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;color:#142c39;background:#f4f7f6;font-synthesis:none;font-size:14px;--navy:#142c39;--muted:#697d89;--line:#e1e9e9;--green:#b8f164;--teal:#058f78;--shadow:0 1px 5px #1727330c}
+* {box-sizing:border-box} html,body{margin:0;min-height:100%;overflow:hidden}button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5} .hidden{display:none!important}
+.app{height:100vh;height:100dvh;display:grid;grid-template-rows:minmax(0,1fr) 55px;background:#f4f7f6;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+.workspace{display:grid;grid-template-columns:minmax(0,54fr) minmax(0,46fr);gap:12px;min-height:0;padding:12px;overflow:hidden}.card{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:16px;min-height:0;overflow:hidden}
+.viewer{display:grid;grid-template-rows:minmax(0,1fr) 48px 29px;background:#11242c;border:none;color:white}.media{position:relative;min-height:0;overflow:hidden;background:#11272e}.media img,.media video{height:100%;width:100%;object-fit:contain;display:block}.media video{display:block;visibility:visible}.media.video-hidden video{visibility:hidden}.media img.hidden{display:none}.media canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.media-tag{position:absolute;left:12px;top:12px;display:flex;align-items:center;gap:7px;padding:7px 12px;color:#10242d;font-weight:800;background:var(--green);border-radius:999px;font-size:.85rem}.status-dot{display:inline-block;width:10px;height:10px;border:2px solid #143129;border-radius:50%}.media-actions{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:7px}.media-actions button{background:#091c24a8;border:1px solid #a3b4b66f;color:#fff;border-radius:12px;min-width:35px;min-height:35px;font-size:19px}.watermark{position:absolute;bottom:8px;left:10px;font-size:.72rem;color:#e6f9fb;text-shadow:0 1px 4px #000;background:#102530aa;padding:3px 7px;border-radius:5px}.transport{display:flex;align-items:center;gap:8px;padding:0 10px;background:#102735}.transport button{border:0;background:transparent;color:white;font-weight:bold;padding:6px;white-space:nowrap}.transport button.play{font-size:21px;width:34px}.transport .time{font-variant-numeric:tabular-nums;color:white;font-size:.78rem;white-space:nowrap}.transport .muted{color:#c5d1d8}input[type=range]{accent-color:var(--green);min-width:12px}.transport input[type=range]{flex:1;margin:0;min-width:0;height:25px}.viewer-foot{background:#112936;display:flex;align-items:center;justify-content:space-between;font-size:.7rem;color:#aec6cb;padding:0 12px;gap:8px}.viewer-foot>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.text-link{border:0;background:none;color:#b9f779;font-weight:bold;white-space:nowrap;padding:3px}
+.results{display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0;gap:10px}.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.metric{display:flex;gap:8px;align-items:center;border:1px solid var(--line);background:white;border-radius:13px;min-height:91px;padding:10px 12px;box-shadow:var(--shadow);overflow:hidden}.metric-symbol{flex:0 0 39px;height:39px;display:grid;place-items:center;border-radius:50%;font-size:24px;font-weight:600;background:#f0f4f5;color:#1f5364}.metric-symbol.green{color:#0a9982}.metric-symbol.blue{color:#288ff4}.metric-symbol.purple{color:#9464ec}.metric-symbol.orange{color:#ef8839}.metric-symbol.force1{color:#4a8cfc}.metric-symbol.force2{color:#d86e92}.metric-body{min-width:0}.metric-body label{font-size:.85rem;font-weight:700;white-space:nowrap;display:block}.measure{display:flex;align-items:baseline;gap:6px;line-height:1.04;margin-top:5px}.measure strong{font-size:2.12rem;letter-spacing:-1px;font-weight:800;font-variant-numeric:tabular-nums}.measure small{font-size:1rem;white-space:nowrap}.metric-hint{display:block;margin-top:5px;font-size:.69rem;color:#7d8e97;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.chart-card{padding:11px 12px 8px;display:grid;grid-template-rows:auto 37px minmax(0,1fr) 19px;gap:4px}.chart-top{display:flex;align-items:center;justify-content:space-between;gap:6px}.chart-top b{font-size:1.07rem;white-space:nowrap}.chart-actions{display:flex;gap:7px;align-items:center;min-width:0}.chart-actions span{font-size:.66rem;white-space:nowrap;color:#728995}.chart-actions button{background:#eef5f2;color:#125348;border:1px solid #d6e9de;border-radius:9px;font-weight:700;font-size:.74rem;padding:5px 7px;white-space:nowrap}.tabs{background:#edf2f1;border-radius:8px;padding:3px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1px}.tabs button{border:0;border-radius:6px;color:#475e69;background:transparent;font-size:.83rem;font-weight:700;padding:5px 0;white-space:nowrap}.tabs button.selected{background:#163241;color:white;box-shadow:0 2px 4px #182f3830}#plot{display:block;width:100%;height:100%;min-height:0;overflow:visible}.legend{display:flex;align-items:center;justify-content:center;gap:14px;font-size:.71rem;color:#52636c;min-width:0}.legend span{display:flex;align-items:center;gap:4px;white-space:nowrap}.dot{width:8px;height:8px;border-radius:50%;display:inline-block}.green-bg{background:#049476}.blue-bg{background:#288ffa}.purple-bg{background:#925df0}.orange-bg{background:#f78a38}.force1-bg{background:#307fce}.force2-bg{background:#de659c}
+.bottom-nav{background:white;border-top:1px solid #dce7e5;display:grid;grid-template-columns:repeat(5,1fr);padding:2px max(4px,env(safe-area-inset-left))}.bottom-nav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;color:#566772;font-size:.77rem;font-weight:700}.bottom-nav span{font-size:24px;line-height:1.1}.bottom-nav button.active{color:#058b73}
+.actionbar{position:absolute;bottom:calc(55px + env(safe-area-inset-bottom) + 9px);left:50%;transform:translateX(-50%);background:#122d3dea;border:1px solid #376074;color:white;box-shadow:0 6px 35px #0b253c35;border-radius:13px;padding:9px 12px;display:flex;gap:12px;align-items:center;font-size:.78rem;max-width:calc(100vw - 20px);min-width:260px;justify-content:space-between;z-index:10;transition:opacity .4s}.actionbar button{border:0;padding:7px 10px;border-radius:8px;background:var(--green);font-weight:800;color:#142c39;white-space:nowrap}.actionbar button#cancelAnalysis{background:#f2e2e2}.actionbar.transient{opacity:0;pointer-events:none}.dialog{border:0;border-radius:20px;padding:20px;width:min(500px,calc(100vw - 24px));max-height:90dvh;overflow:auto;box-shadow:0 20px 100px #0f1d276b}.dialog::backdrop{background:#13232b99}.dialog form{display:grid;gap:12px}.dialog-head{display:flex;align-items:center;justify-content:space-between}.dialog-head h2{margin:0;font-size:1.25rem}.dialog-head button{border:0;background:#eef3f3;border-radius:9px;padding:8px 11px}.subtle{font-size:.82rem;color:#67808d;margin:0;line-height:1.5}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.form-grid label{display:grid;gap:5px;color:#253947;font-weight:700;font-size:.83rem}.form-grid input,.form-grid select{border:1px solid #d5e2e1;padding:11px 8px;border-radius:9px;background:white;width:100%;font-size:.86rem}.small-warning{padding:10px;background:#fff6e7;border-radius:9px;color:#926222;font-size:.77rem;margin:0;line-height:1.5}.dialog-actions{display:flex;justify-content:flex-end;gap:10px}.dialog-actions button{padding:11px 14px;border-radius:9px;font-weight:700;border:1px solid #dce6e5}.dialog-actions .primary{background:#143340;color:#fff;border:0}.dialog-actions .outline{background:white}
+@media(min-width:768px) and (min-height:640px){.app{max-width:1900px;margin:auto}.results .metrics{grid-auto-rows:minmax(84px,1fr)}.viewer{grid-template-rows:minmax(0,1fr) 50px 29px}}
+@media(max-width:767px), (max-height:639px){.workspace{grid-template-columns:1fr;grid-template-rows:minmax(0,1.16fr) auto minmax(0,.79fr);padding:5px;gap:6px}.viewer{grid-template-rows:minmax(0,1fr) 36px;box-shadow:none;border-radius:10px}.viewer-foot{display:none}.transport{gap:3px;padding:0 6px}.transport button{padding:3px}.transport button.play{font-size:16px;width:24px}.transport .time{font-size:.66rem}.media-tag{padding:4px 8px;font-size:.71rem;top:7px;left:7px}.media-actions{top:7px;right:7px}.media-actions button{min-width:26px;min-height:26px;font-size:14px;border-radius:7px}.watermark{font-size:.6rem;left:5px;bottom:5px}.results{display:contents}.metrics{gap:5px;grid-auto-rows:51px}.metric{min-height:0;height:51px;padding:4px 7px;gap:6px;border-radius:8px;box-shadow:none}.metric-symbol{flex-basis:26px;width:26px;height:26px;font-size:18px}.metric-body label{font-size:.67rem}.measure{margin-top:1px;gap:4px}.measure strong{font-size:1.5rem}.measure small{font-size:.81rem}.metric-hint{font-size:.55rem;margin-top:0}.chart-card{border-radius:9px;padding:6px 8px 4px;gap:2px;grid-template-rows:auto 28px minmax(0,1fr) 14px}.chart-top b{font-size:.82rem}.chart-actions span{font-size:.56rem}.chart-actions button{font-size:.64rem;padding:2px 5px}.tabs{padding:1px}.tabs button{font-size:.68rem;padding:4px 0}.legend{font-size:.62rem;gap:9px}.bottom-nav button{font-size:.65rem}.bottom-nav span{font-size:20px}.app{grid-template-rows:minmax(0,1fr) 49px}.actionbar{bottom:calc(49px + env(safe-area-inset-bottom) + 5px);padding:7px 9px}.form-grid{grid-template-columns:1fr 1fr}}
+@media(max-height:720px) and (max-width:767px){.metrics{grid-auto-rows:44px}.metric{height:44px}.metric-hint{display:none}.measure strong{font-size:1.32rem}.media-tag{font-size:.64rem}.chart-card{grid-template-rows:auto 25px minmax(0,1fr) 12px}}
+@media(orientation:landscape) and (max-width:767px) and (max-height:500px){body::after{content:"スマートフォンは縦向きでご利用ください";position:fixed;z-index:999;inset:0;background:#0f2b38;color:white;display:grid;place-items:center;font-size:1.1rem;font-weight:800;text-align:center;padding:20px}}
+
+/* v0.3: no sample screen. Welcome guide is intentionally lightweight. */
+.welcome{min-height:0;overflow-y:auto;display:grid;align-items:center;justify-items:center;padding:16px 20px 18px;overscroll-behavior:contain}
+.guide-shell{width:min(780px,100%);display:grid;gap:20px}
+.guide-mark{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:900;letter-spacing:.04em;color:#123141}
+.guide-logo{width:38px;height:38px;display:grid;place-items:center;background:#153844;color:#bdf269;font-size:22px;border-radius:12px}
+.guide-version{margin-left:auto;color:#74908b;background:#e5efec;padding:4px 9px;font-size:.7rem;border-radius:99px;letter-spacing:0}
+.guide-heading{text-align:center;display:grid;gap:7px}
+.guide-eyebrow{color:#148d7c;font-size:12px;font-weight:800}
+.guide-heading h1{font-size:clamp(20px,4vw,30px);letter-spacing:-.03em;line-height:1.25;margin:0}
+.guide-heading p{margin:0;color:#6d838e;font-size:13px;line-height:1.6}
+.guide-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.guide-step{display:flex;align-items:center;gap:9px;min-width:0;background:white;border:1px solid #dce9e7;border-radius:14px;padding:12px;position:relative}
+.step-number{position:absolute;top:6px;right:8px;color:#b6c8c7;font-size:10px;font-weight:800}
+.step-symbol{font-size:24px;color:#0b917a;flex:0 0 30px;text-align:center}
+.guide-step strong{display:block;font-size:13px;white-space:nowrap}.guide-step small{display:block;color:#7a8c91;font-size:10px;line-height:1.5;margin-top:3px}
+.guide-card{display:grid;gap:15px;background:white;border:1px solid #e0e9e7;border-radius:19px;padding:22px;box-shadow:0 7px 28px #142c3910}
+.guide-card-head{display:flex;align-items:baseline;gap:8px}.guide-card-head strong{font-size:16px}.guide-card-head span{font-size:11px;color:#8c9a9d}
+.guide-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.guide-fields label{display:grid;gap:5px;font-size:12px;color:#3d5360;font-weight:800}.guide-fields label span{display:inline;font-size:10px;font-weight:500;color:#8c9ea5}
+.guide-fields input,.guide-fields select{border:1px solid #d1dfe0;border-radius:10px;padding:10px 11px;width:100%;min-width:0;color:#152c38;background:#f9fbfa;font-size:17px}
+.guide-primary{border:0;background:#163a41;color:#fff;border-radius:12px;font-size:17px;font-weight:800;padding:16px 18px;display:flex;justify-content:center;gap:8px;align-items:center}
+.guide-primary span{margin-left:auto;color:#b8f16b;font-size:22px}
+.guide-resume{border:1px solid #a7d6c9;color:#127f6d;background:#e9f9f2;border-radius:10px;padding:9px;font-weight:800}
+.guide-tip,.guide-foot{color:#839398;font-size:11px;text-align:center;margin:0;line-height:1.5}.guide-foot{font-size:10px}
+@media(max-width:767px){.welcome{padding:10px 12px;align-items:start}.guide-shell{gap:11px}.guide-mark{font-size:12px}.guide-logo{width:30px;height:30px;font-size:18px}.guide-heading{gap:3px}.guide-heading h1{font-size:20px}.guide-heading p{font-size:11px}.guide-steps{grid-template-columns:1fr;gap:5px}.guide-step{padding:6px 10px;border-radius:10px;gap:9px}.step-symbol{font-size:19px;flex-basis:25px}.guide-step strong{font-size:12px}.guide-step small{font-size:10px;margin-top:0}.guide-card{padding:12px;gap:10px;border-radius:12px}.guide-card-head strong{font-size:14px}.guide-fields{gap:6px}.guide-fields input,.guide-fields select{font-size:15px;padding:8px 6px}.guide-fields label{font-size:11px}.guide-primary{padding:12px;font-size:15px}.guide-tip,.guide-foot{font-size:10px}}
+@media(max-height:690px) and (max-width:767px){.guide-shell{gap:7px}.guide-step{padding:4px 8px}.guide-heading p{font-size:10px}.guide-card{gap:8px}.guide-primary{padding:10px}}
+
+/* v0.4: three-page metric dashboard; cards tap to select a chart. */
+.results{grid-template-rows:auto auto minmax(0,1fr) auto;gap:7px}
+.page-switch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:#e6eeed;padding:3px;border-radius:11px;gap:3px;min-width:0}
+.page-switch button{border:0;background:transparent;border-radius:8px;padding:10px 4px;color:#526c75;font-weight:800;font-size:.82rem;white-space:nowrap}
+.page-switch button.selected{color:white;background:#193947;box-shadow:0 1px 4px #0002}
+.metrics{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr))}
+.metric{cursor:pointer;transition:border-color .15s,background .15s;min-width:0}
+.metric[role=button]:focus-visible{outline:3px solid #26ad8c;outline-offset:1px}
+.metric.is-selected{border-color:#12a087;background:#f2fbf7}
+.measure{flex-wrap:wrap;gap:3px 6px}
+.measure.dual{gap:9px}
+.measure.dual .measure-pair{display:flex;align-items:baseline;gap:3px;min-width:0}
+.measure.dual strong{font-size:1.48rem;letter-spacing:-.5px}
+.side-name{font-size:.65rem;font-weight:800;color:#748b95}
+.page-help{font-size:.66rem;color:#7d9099;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;text-align:center}
+.chart-card{grid-template-rows:auto 32px minmax(0,1fr) 19px}
+.tabs{display:flex;overflow-x:auto;scrollbar-width:none;gap:2px}.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:1 0 auto;min-width:44px;padding:6px 10px}
+.legend{overflow:hidden;gap:8px;justify-content:center}.legend span{font-size:.68rem}
+@media(max-width:767px), (max-height:639px){
+  .workspace{grid-template-columns:1fr;grid-template-rows:minmax(0,0.88fr) minmax(0,1.12fr);padding:5px;gap:6px}
+  .results{display:grid;grid-template-rows:31px auto minmax(0,1fr) 11px;gap:4px;min-height:0}
+  .page-switch button{padding:5px 1px;font-size:.70rem}
+  .metrics{grid-template-rows:repeat(3,45px);gap:4px;min-height:0}
+  .metric{height:45px;padding:3px 6px;gap:5px;align-items:center}
+  .metric-symbol{width:23px;flex-basis:23px;height:23px;font-size:15px}
+  .metric-body label{font-size:.67rem}.metric-hint{font-size:.53rem;line-height:1.1}
+  .measure strong{font-size:1.22rem}.measure.dual{gap:5px}.measure.dual strong{font-size:1.06rem}
+  .side-name{font-size:.53rem}.measure small{font-size:.67rem}
+  .chart-card{grid-template-rows:auto 27px minmax(0,1fr) 12px;gap:2px;padding:5px 7px 3px}
+  .tabs button{min-width:43px;font-size:.68rem;padding:3px 8px}
+  .legend{gap:5px}.legend span{font-size:.57rem}.page-help{font-size:.55rem}
+}
+@media(min-width:768px) and (min-height:640px){.results .metrics{grid-auto-rows:unset;grid-template-rows:repeat(3,minmax(0,1fr))}}
+@media(max-height:720px) and (max-width:767px){.metrics{grid-template-rows:repeat(3,39px)}.metric{height:39px}.metric-hint{display:none}.page-help{display:none}.results{grid-template-rows:29px auto minmax(0,1fr)}}
+
+/* Research v0.5: compact export and optional time range fields */
+.chart-actions button{white-space:nowrap}
+@media(max-width:410px){.chart-actions{gap:4px}.chart-actions button{font-size:11px;padding:5px}}
+
+/* v0.6: iOS Safari friendly native file picker via <label for> */
+.bottom-nav label {border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;color:#566772;font-size:.77rem;font-weight:700;cursor:pointer;}
+.bottom-nav label span {font-size:24px;line-height:1.1;}
+.bottom-nav label.active {color:#058b73;}
+.native-file-input {position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:0;clip-path:inset(50%);overflow:hidden;z-index:-1;}
+.guide-status{margin:0;padding:8px 10px;border-radius:10px;background:#e7f4f0;color:#245668;text-align:center;font-size:12px;min-height:32px;}
+.guide-status.error{background:#fff1ed;color:#983b30;}
+.guide-primary:focus-visible,.bottom-nav label:focus-visible,.viewer-foot label:focus-visible{outline:3px solid #64b2ac;outline-offset:2px;}
+@media(max-width:767px){.bottom-nav label{font-size:.65rem}.bottom-nav label span{font-size:20px}.guide-status{font-size:11px;padding:6px;}}
+
+/* v0.7: multi-select chart toggles and floor-reaction arrows */
+.metric.is-selected{background:#eefbf3;border-color:#048d72;box-shadow:inset 3px 0 0 #06987b,0 1px 5px #102e3a12}
+.metric:not(.is-selected){opacity:.77}
+.tabs button.selected{background:#0b776b;color:white;box-shadow:inset 0 0 0 1px #0b776b}
+.tabs button[aria-pressed="false"]{background:#fff;color:#455c65;box-shadow:inset 0 0 0 1px #b9ceca}
+.tabs{background:transparent;gap:4px}
+
+/* v0.8 dual right BW axis and all angular-speed lines on page 03 */
+.force-toggle{display:inline-flex;gap:3px;align-items:center;white-space:nowrap;color:#98612c;font-size:11px;font-weight:750;cursor:pointer;border:1px solid #f1ddc9;background:#fff8ee;border-radius:7px;padding:3px 5px}
+.force-toggle input{width:14px;height:14px;accent-color:#d28b39;margin:0}
+.legend{overflow-x:auto;scrollbar-width:thin;justify-content:flex-start;max-width:100%;}
+.chart-top b{overflow:hidden;text-overflow:ellipsis;min-width:0}
+@media(max-width:767px){.force-toggle{font-size:9px;padding:2px 3px}.force-toggle input{height:12px;width:12px}.chart-actions{gap:3px}.chart-actions #modeNote{display:none}}
+
+/* Two-row metric page avoids a dead third row and gives the chart more room. */
+.metrics[data-page="dynamics"]{grid-template-rows:repeat(2,minmax(0,1fr))}
+@media(max-width:767px), (max-height:639px){.metrics[data-page="dynamics"]{grid-template-rows:repeat(2,45px)}}
+@media(max-height:720px) and (max-width:767px){.metrics[data-page="dynamics"]{grid-template-rows:repeat(2,39px)}}
+
+/* v1.0: Uniform graph dimensions on all four pages. */
+.page-switch{grid-template-columns:repeat(4,minmax(0,1fr))}
+.results{grid-template-rows:auto minmax(0, 1fr) minmax(0, 1.6fr) auto;}
+.results .metrics,
+.results .metrics[data-page="dynamics"],
+.results .metrics[data-page="upper"],
+.results .metrics[data-page="lower"]{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));grid-auto-rows:unset;min-height:0;overflow:hidden;align-content:stretch;}
+.results .metrics .metric{min-height:0;height:auto;}
+.chart-card{grid-template-rows:auto 32px minmax(0,1fr) 29px 19px;min-height:0;}
+.event-strip{display:flex;gap:6px;align-items:center;min-width:0;min-height:0;overflow-x:auto;scrollbar-width:thin;white-space:nowrap;border-top:1px solid #eaf0ed;padding:2px 0;}
+.event-chip{display:inline-flex;align-items:center;flex:0 0 auto;font-size:10px;line-height:1.1;padding:4px 6px;border-radius:5px;background:#edf4f2;color:#486870;font-weight:700;}
+.event-chip.drive{background:#e7f1ff;color:#2265af;border-left:3px dashed #59a5fa}
+.event-chip.lead{background:#fff1e0;color:#aa601d;border-left:3px dashed #f5a13d}
+.event-chip.release{background:#e7eef3;color:#183845;border-left:3px solid #183845}
+.event-chip.more{background:#f3f4f4;color:#79898c}
+@media (max-width:767px), (max-height:639px){
+  .results{grid-template-rows:31px minmax(0, 154px) minmax(0,1fr) 11px;}
+  .results .metrics, .results .metrics[data-page="dynamics"],.results .metrics[data-page="upper"],.results .metrics[data-page="lower"]{grid-template-rows:repeat(3,minmax(0,1fr));height:154px;gap:4px;}
+  .results .metrics .metric{height:auto;min-height:0;padding:3px 6px;}
+  .page-switch button{font-size:.63rem;letter-spacing:-.04em;padding:5px 0;}
+  .chart-card{grid-template-rows:auto 27px minmax(0,1fr) 24px 12px;}
+  .event-strip{gap:4px;}
+  .event-chip{font-size:9px;padding:3px 5px;}
+}
+@media(max-height:720px) and (max-width:767px){
+  .results{grid-template-rows:29px minmax(0,120px) minmax(0,1fr);}
+  .results .metrics,.results .metrics[data-page="dynamics"],.results .metrics[data-page="upper"],.results .metrics[data-page="lower"]{height:120px;}
+  .event-chip{font-size:8px;padding:2px 4px;}
+}
+/* Keep the common metrics section height, while filling it with larger cards
+   on pages that intentionally contain four (rather than six) data items. */
+.results .metrics[data-page="dynamics"],
+.results .metrics[data-page="lower"]{grid-template-rows:repeat(2,minmax(0,1fr));}
+@media(max-width:767px), (max-height:639px){
+  .results .metrics[data-page="dynamics"],
+  .results .metrics[data-page="lower"]{grid-template-rows:repeat(2,minmax(0,1fr));}
+  .event-chip{font-size:10px;padding:4px 6px;}
+}
+
+/* v1.1: keep overflowing strokes within SVG; axes, scales and labels remain inside viewBox */
+#plot{overflow:hidden;}
+
+/* v1.2: proportional chart sizing; 01 preserved, 02 shorter, 03/04 taller. */
+.results[data-page="dynamics"]{grid-template-rows:auto minmax(0,1.2fr) minmax(0,1.25fr) auto;}
+.results[data-page="upper"],.results[data-page="lower"]{grid-template-rows:auto minmax(0,.88fr) minmax(0,1.77fr) auto;}
+/* Marker legend replaces long overflowing timestamps; full times remain in accessibility text and tooltips. */
+.event-strip{overflow-x:auto;overflow-y:hidden;white-space:nowrap;justify-content:flex-start;gap:10px;}
+.event-chip{border:0 !important;background:transparent !important;padding:2px 0 !important;gap:3px;font-size:10px;}
+.event-chip .event-symbol{font-size:13px;font-weight:900;letter-spacing:-2px;}
+.event-chip.drive .event-symbol{color:#59a5fa;}
+.event-chip.lead .event-symbol{color:#f5a13d;}
+.event-chip.release .event-symbol{color:#183845;}
+@media(max-width:767px), (max-height:639px){
+  .results[data-page="dynamics"]{grid-template-rows:31px minmax(0,174px) minmax(0,1fr) 11px;}
+  .results[data-page="upper"],.results[data-page="lower"]{grid-template-rows:31px minmax(0,130px) minmax(0,1fr) 11px;}
+  .results[data-page="dynamics"] .metrics{height:174px;}
+  .results[data-page="upper"] .metrics,.results[data-page="lower"] .metrics{height:130px;}
+  .event-chip{font-size:9px;}
+}
+@media(max-height:720px) and (max-width:767px){
+  .results[data-page="dynamics"]{grid-template-rows:29px minmax(0,134px) minmax(0,1fr);}
+  .results[data-page="upper"],.results[data-page="lower"]{grid-template-rows:29px minmax(0,106px) minmax(0,1fr);}
+  .results[data-page="dynamics"] .metrics{height:134px;}
+  .results[data-page="upper"] .metrics,.results[data-page="lower"] .metrics{height:106px;}
+}
+
+
+/* v1.3: Keep 01/04 as accepted. 02 and 03 use the 04 two-row card
+   proportions. Avoid compressing four upper-body cards into three rows. */
+.results .metrics[data-page="upper"] {
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+.results[data-page="dynamics"] {
+  grid-template-rows: auto minmax(0, .88fr) minmax(0, 1.77fr) auto;
+}
+@media (max-width:767px), (max-height:639px) {
+  .results[data-page="dynamics"] {
+    grid-template-rows: 31px minmax(0, 130px) minmax(0, 1fr) 11px;
+  }
+  .results[data-page="dynamics"] .metrics {height:130px;}
+}
+@media (max-height:720px) and (max-width:767px) {
+  .results[data-page="dynamics"] {
+    grid-template-rows: 29px minmax(0, 106px) minmax(0, 1fr);
+  }
+  .results[data-page="dynamics"] .metrics {height:106px;}
+}
+
+/* v1.6: iPad mini right-panel fix. The chart and control rows must shrink
+   inside the two-column grid rather than expanding the document width. */
+.workspace > *, .results, .chart-card, .chart-top, .chart-actions,
+.metrics, .page-switch, .tabs, #plot {min-width:0;max-width:100%;}
+.chart-card {width:100%;overflow:hidden;}
+.chart-top {min-width:0;display:flex;flex-wrap:wrap;justify-content:space-between;}
+.chart-top > b {min-width:0;flex:1 1 90px;}
+.chart-actions {flex:0 1 auto;flex-wrap:wrap;justify-content:flex-end;}
+.tabs {width:100%;overflow-x:auto;overscroll-behavior-x:contain;}
+#plot {width:100%;height:100%;display:block;}
+.metric-body {min-width:0;overflow:hidden;}
+.metric-body label {overflow:hidden;text-overflow:ellipsis;}
+.license-note {line-height:1.65;padding:11px 12px;border-left:3px solid #ce8b4b;background:#fff8eb;border-radius:7px;color:#513d28;font-size:.85rem;margin:0;}
+@media(min-width:768px) and (max-width:1199px) and (min-height:640px){
+  .workspace {grid-template-columns:minmax(0,49fr) minmax(0,51fr);gap:8px;padding:8px;}
+  .chart-card {padding:8px 8px 7px;}
+  .chart-top b {font-size:.91rem;}
+  .chart-actions #modeNote {display:none;}
+  .chart-actions button {padding:4px 5px;}
+  .metric {gap:5px;padding:7px 8px;}
+  .metric-symbol {flex-basis:28px;width:28px;height:28px;font-size:16px;}
+  .measure strong {font-size:clamp(1.3rem,2vw,1.8rem);}
+  .metric-body label {font-size:.75rem;}
+  .metric-hint {font-size:.6rem;}
+  .page-switch button {font-size:.7rem;padding:6px 2px;letter-spacing:-.025em;}
+  .tabs button {font-size:.68rem;padding:5px 7px;}
+}
+/* Five metrics on page 02: 2-column, 3-row like page 01. */
+.results .metrics[data-page="dynamics"] {grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));}
+@media(min-width:768px) and (min-height:640px){
+  .results[data-page="dynamics"] {grid-template-rows:auto minmax(0,1.18fr) minmax(0,1.58fr) auto;}
+}
+@media(max-width:767px), (max-height:639px){
+  .results[data-page="dynamics"] .metrics {grid-template-rows:repeat(3,minmax(0,1fr));height:154px;}
+  .results[data-page="dynamics"] {grid-template-rows:31px minmax(0,154px) minmax(0,1fr) 11px;}
+}
+@media(max-height:720px) and (max-width:767px){
+  .results[data-page="dynamics"] .metrics {height:120px;}
+  .results[data-page="dynamics"] {grid-template-rows:29px minmax(0,120px) minmax(0,1fr);}
+}
+
+/* v1.6: the five dynamics selectors must remain visible on iPad mini. */
+.results[data-page="dynamics"] .tabs {display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;overflow:hidden;}
+.results[data-page="dynamics"] .tabs button {min-width:0;padding:5px 1px;font-size:clamp(.62rem,.9vw,.78rem);overflow:hidden;text-overflow:clip;white-space:nowrap;}
+@media(max-width:767px){.results[data-page="dynamics"] .tabs button {font-size:.64rem;}}
+
+/* v1.8: Compact research settings; actions stay reachable on short screens. */
+#settingsDialog{width:min(620px,calc(100vw - 20px));padding:14px 16px;max-height:min(92dvh,840px);}
+#settingsDialog form{gap:8px;}
+#settingsDialog .form-grid{gap:7px 10px;}
+#settingsDialog .form-grid label{gap:3px;font-size:.75rem;line-height:1.25;}
+#settingsDialog .form-grid input,#settingsDialog .form-grid select{padding:7px 8px;min-height:32px;font-size:.80rem;}
+#settingsDialog .small-warning{padding:7px;font-size:.7rem;line-height:1.35;}
+#settingsDialog .dialog-head h2{font-size:1.08rem;}
+#settingsDialog .subtle{font-size:.75rem;}
+#settingsDialog .dialog-actions{position:sticky;bottom:-14px;z-index:2;padding:9px 0 2px;background:linear-gradient(0deg,#fff 80%,#fffef9);}
+#settingsDialog .dialog-actions button{padding:8px 14px;}
+@media(max-height:700px){#settingsDialog{max-height:96dvh;padding:10px 14px;}#settingsDialog .form-grid{gap:5px 8px;}#settingsDialog .form-grid input,#settingsDialog .form-grid select{padding:5px 7px;min-height:28px;}#settingsDialog .small-warning{display:none;}}
+
+/* v1.9 – Setting fields scroll independently. Header and save controls must
+   remain visible on iPad mini landscape, phones, and while the keyboard opens.
+   Do not put scrolling on <dialog>: it can hide the footer outside the viewport. */
+#settingsDialog {
+  box-sizing: border-box;
+  padding: 0;
+  border-radius: 18px;
+  width: min(620px, calc(100vw - 24px));
+  max-width: calc(100vw - 20px);
+  max-height: none;
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+#settingsDialog[open] { display: block; }
+#settingsDialog form {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  height: auto;
+  max-height: min(840px, calc(100dvh - 32px));
+  min-height: 0;
+}
+#settingsDialog .dialog-head {
+  flex: 0 0 auto;
+  padding: 14px 18px 10px;
+  border-bottom: 1px solid #e6eeee;
+  background: #fff;
+}
+#settingsDialog .settings-scroll {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 18px 14px;
+  scrollbar-gutter: stable;
+}
+#settingsDialog .settings-scroll .subtle {margin: 0 0 10px;}
+#settingsDialog .settings-scroll .form-grid {gap: 9px 12px;}
+#settingsDialog .settings-scroll .small-warning {margin-top: 11px;display: block;}
+@supports not (height: 1dvh) {
+  #settingsDialog form {height: auto;max-height: min(840px, calc(100vh - 32px));}
+}
+#settingsDialog .dialog-actions {
+  position: static;
+  bottom: auto;
+  flex: 0 0 auto;
+  margin: 0;
+  z-index: 4;
+  padding: 12px 18px calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid #e0e9e9;
+  background: #fff;
+  box-shadow: 0 -4px 16px #1433400d;
+}
+#settingsDialog .dialog-actions button {min-height: 42px;padding: 9px 16px;}
+@media(max-width: 440px) {
+  #settingsDialog .dialog-head {padding: 10px 12px 8px;}
+  #settingsDialog .settings-scroll {padding: 10px 12px;}
+  #settingsDialog .dialog-actions {padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));}
+  #settingsDialog .dialog-actions button {flex: 1;}
+  #settingsDialog .settings-scroll .form-grid {gap: 7px 8px;}
+  #settingsDialog .form-grid label {font-size: .72rem;}
+  #settingsDialog .form-grid input, #settingsDialog .form-grid select {min-height: 34px;}
+}
+
+/* v2.2 - dismissable feedback: do not let long messages hide the close control. */
+.actionbar #message{min-width:0;flex:1;overflow-wrap:anywhere;line-height:1.4}
+.actionbar #dismissMessage{flex:0 0 auto;background:transparent;color:#f9feff;border:1px solid #89a5b1;border-radius:8px;font-size:17px;font-weight:800;line-height:1;min-width:31px;min-height:31px;padding:5px;cursor:pointer}
+.actionbar #dismissMessage:hover,.actionbar #dismissMessage:focus-visible{background:#315263;outline-offset:2px}
+
+
+/* v2.8 - Source-of-truth coloring: card outlines / selector fills match
+   their plotted SVG paths, including F1=orange, F2=blue. */
+.metric[data-series="true"] {
+  border-color:var(--series-color);
+  border-right-color:var(--series-secondary);
+}
+.metric[data-series="true"].is-selected {
+  border-color:var(--series-color);
+  border-right-color:var(--series-secondary);
+  background:color-mix(in srgb,var(--series-color) 8%,white);
+  box-shadow:inset 3px 0 0 var(--series-color),0 1px 5px #102e3a12;
+}
+.metric[data-series="true"] .metric-symbol {color:var(--series-color);}
+/* The two outline halves correspond to the two separate L/R lines. */
+.tabs button[data-series="true"][aria-pressed="true"] {
+  color:var(--series-ink);
+  background:var(--series-color);
+  border:1px solid var(--series-color);
+  box-shadow:none;
+}
+.tabs button[data-series="true"].multi-series[aria-pressed="true"] {
+  color:#fff;
+  background:linear-gradient(to right,var(--series-color) 0 50%,var(--series-secondary) 50% 100%);
+  border-color:var(--series-color);
+}
+.tabs button[data-series="true"][aria-pressed="false"] {
+  color:var(--series-color);
+  background:white;
+  border:1px solid color-mix(in srgb,var(--series-color) 60%,white);
+  box-shadow:none;
+}
+.tabs button[data-series="true"].multi-series[aria-pressed="false"] {
+  border-right-color:var(--series-secondary);
+}
+
+/* v3.2: five navigation pages with accessible horizontal scrolling on compact viewports. */
+.page-switch {grid-template-columns:repeat(5,minmax(0,1fr));}
+.page-switch button {font-size:clamp(.65rem,.73vw,.82rem);padding:8px 1px;}
+@media (max-width:1100px) {
+ .page-switch {display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;gap:2px;}
+ .page-switch button {flex:0 0 auto;min-width:99px;padding:7px 8px;font-size:.75rem;}
+}
+.results[data-page="forces"] {grid-template-rows:auto minmax(0,.88fr) minmax(0,1.77fr) auto;}
+.results .metrics[data-page="forces"] {grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));height:auto;min-height:0;overflow:hidden;}
+.results[data-page="forces"] .tabs {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;overflow:hidden;}
+.results[data-page="forces"] .tabs button {min-width:0;padding:5px 1px;font-size:.74rem;white-space:nowrap;}
+.force-toggle[hidden] {display:none!important;}
+@media(max-width:767px),(max-height:639px) {
+ .results[data-page="forces"] {grid-template-rows:31px minmax(0,130px) minmax(0,1fr) 11px;}
+ .results[data-page="forces"] .metrics {height:130px;}
+ .results[data-page="forces"] .tabs button {font-size:.67rem;}
+}
+@media(max-height:720px) and (max-width:767px) {
+ .results[data-page="forces"] {grid-template-rows:29px minmax(0,106px) minmax(0,1fr);}
+ .results[data-page="forces"] .metrics {height:106px;}
+}
+/* 03 - mechanics / distance now contains exactly three cards (two rows). */
+.results .metrics[data-page="dynamics"] {grid-template-rows:repeat(2,minmax(0,1fr));}
+.results[data-page="dynamics"] {grid-template-rows:auto minmax(0,.88fr) minmax(0,1.77fr) auto;}
+@media(max-width:767px),(max-height:639px) {
+ .results[data-page="dynamics"] {grid-template-rows:31px minmax(0,130px) minmax(0,1fr) 11px;}
+ .results[data-page="dynamics"] .metrics {height:130px;grid-template-rows:repeat(2,minmax(0,1fr));}
+}
+@media(max-height:720px) and (max-width:767px) {
+ .results[data-page="dynamics"] {grid-template-rows:29px minmax(0,106px) minmax(0,1fr);}
+ .results[data-page="dynamics"] .metrics {height:106px;}
+}
+
+/* v3.3: six equal-height ground-reaction cards, matching page 01. */
+.results[data-page="forces"]{grid-template-rows:auto minmax(0,1fr) minmax(0,1.45fr) auto;}
+.results .metrics[data-page="forces"]{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));height:auto;min-height:0;}
+.results[data-page="forces"] .tabs{grid-template-columns:repeat(6,minmax(0,1fr));}
+.results[data-page="forces"] .tabs button{font-size:clamp(.60rem,.73vw,.75rem);}
+@media (max-width:767px),(max-height:639px){
+ .results[data-page="forces"]{grid-template-rows:31px minmax(0,154px) minmax(0,1fr) 11px;}
+ .results[data-page="forces"] .metrics{height:154px;grid-template-rows:repeat(3,minmax(0,1fr));}
+ .results[data-page="forces"] .tabs button{font-size:.59rem;}
+}
+@media (max-height:720px) and (max-width:767px){
+ .results[data-page="forces"]{grid-template-rows:29px minmax(0,120px) minmax(0,1fr);}
+ .results[data-page="forces"] .metrics{height:120px;}
+ .results[data-page="forces"] .tabs button{font-size:.56rem;}
+}
+/* Public Preview: three pages, no foot events or experimental biomechanics. */
+.page-switch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.page-switch button{min-width:0;white-space:nowrap}
+.results .metrics[data-page="speed"]{grid-template-rows:repeat(3,minmax(0,1fr))}
+.results .metrics[data-page="forces"],.results .metrics[data-page="dynamics"]{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
+.results[data-page="forces"],.results[data-page="dynamics"]{grid-template-rows:auto minmax(0,.80fr) minmax(0,1.72fr) auto}
+.results[data-page="forces"] .tabs,.results[data-page="dynamics"] .tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:hidden}
+.results[data-page="forces"] .tabs button,.results[data-page="dynamics"] .tabs button{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chart-card{grid-template-rows:auto 37px minmax(0,1fr) 17px}
+#plot{min-height:170px}
+@media(max-width:767px), (max-height:639px){
+ .results .metrics[data-page="speed"]{grid-template-rows:repeat(3,47px);height:auto}
+ .results .metrics[data-page="forces"],.results .metrics[data-page="dynamics"]{grid-template-rows:repeat(2,49px);height:auto}
+ .results[data-page="forces"],.results[data-page="dynamics"]{grid-template-rows:30px auto minmax(190px,1fr) auto}
+ .chart-card{grid-template-rows:auto 30px minmax(160px,1fr) 15px}
+ #plot{min-height:160px}
+ .page-switch{gap:3px}
+}
+
+/* Public v1.1: independent toggles for video and landmark skeleton. */
+.media.pose-hidden canvas { visibility:hidden; }
+.media .media-actions { z-index:3; }
+.media .media-actions button.view-toggle {
+  min-width:88px; min-height:33px; padding:5px 9px;
+  font-size:12px; font-weight:750; line-height:1.15;
+  letter-spacing:0; white-space:nowrap; border-radius:9px;
+  background:rgba(9,27,36,.86); border:1px solid rgba(210,237,232,.50);
+}
+.media .media-actions button.view-toggle[aria-pressed="true"]{
+  background:rgba(184,241,100,.96); border-color:rgba(184,241,100,1);
+  color:#112b36;
+}
+.media .media-actions button.view-toggle:focus-visible,
+.media .media-actions #expandButton:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+@media(max-width:767px), (max-height:639px){
+  .media .media-actions button.view-toggle{min-width:71px;min-height:25px;font-size:10px;padding:4px 5px;}
+}
+
+/* Public v1.2: six equal-height cards and six compact force selectors. */
+.results[data-page="forces"]{grid-template-rows:auto minmax(0,1fr) minmax(0,1.30fr) auto;}
+.results .metrics[data-page="forces"]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));height:100%;min-height:0;gap:7px;}
+.results[data-page="forces"] .tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;overflow:hidden;}
+.results[data-page="forces"] .tabs button{font-size:clamp(.53rem,.68vw,.72rem);min-width:0;padding:4px 1px;white-space:nowrap;letter-spacing:-.04em;}
+.media.pose-hidden canvas{visibility:visible;} /* Canvas also hosts independently toggled force arrows. */
+.media .media-actions button#arrowsDisplayButton[aria-pressed="true"]{background:rgba(243,155,51,.94);border-color:#f39b33;color:#17313d;}
+@media(max-width:767px),(max-height:639px){
+ .results[data-page="forces"]{grid-template-rows:30px minmax(0,159px) minmax(180px,1fr) auto;}
+ .results .metrics[data-page="forces"]{grid-template-rows:repeat(3,minmax(0,1fr));height:159px;gap:4px;}
+ .results[data-page="forces"] .tabs button{font-size:.56rem;padding:3px 0;}
+ .media .media-actions button#arrowsDisplayButton{font-size:9px;}
+}
+@media(max-height:720px) and (max-width:767px){
+ .results[data-page="forces"]{grid-template-rows:29px minmax(0,123px) minmax(165px,1fr) auto;}
+ .results .metrics[data-page="forces"]{height:123px;}
+}
+
+/* v1.3 Public: 6 speed indicators and 6 force indicators share three equal rows. */
+.results .metrics[data-page="speed"],.results .metrics[data-page="forces"]{
+  grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));
+}
+@media(max-width:767px),(max-height:639px){
+  .results .metrics[data-page="speed"],.results .metrics[data-page="forces"]{
+    grid-template-rows:repeat(3,minmax(0,1fr));
+  }
+}
+
+/* v1.5: responsive chart fitting, prevent legends/axis from overflowing */
+.chart-card, .results, .workspace { min-width:0; }
+#plot { width:100%; max-width:100%; min-width:0; overflow:hidden; display:block; }
+.legend { min-width:0; max-width:100%; flex-wrap:wrap; overflow-x:hidden; overflow-y:auto; }
+@media (max-width:600px){ .chart-card{min-width:0;} #plot{min-height:170px;} }

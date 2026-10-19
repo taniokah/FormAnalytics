@@ -142,3 +142,7 @@ The Software and all estimates are provided **AS IS**, without warranty of accur
 ### Analysis progress (v1.6.6)
 
 During analysis, a determinate progress bar replaces the playing video preview. The percentage reflects **completed frame inferences divided by the total scheduled frames**. The pose model and original single-pass calculation are unchanged; the application runs a single pose inference per sampled frame. The existing model-selection settings are unchanged.
+
+### Position smoothing (v1.6.6)
+
+The public release applies a conventional centered moving mean to the 2D pelvis midpoint proxy, thorax, upper-limb joint tracks, ankle spacing, and foot support locations **before** differentiation and approximate force allocation. Each valid center uses up to five frames (two before, itself, and two after), limited to observations within 0.16 s. Missing centers are not synthesized. This does **not** implement repeat inference, confidence-weighted fusion, or any unreleased research algorithm. The contact-event heuristic itself remains unchanged.

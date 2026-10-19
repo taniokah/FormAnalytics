@@ -278,12 +278,47 @@ function allocateFootForcesFiled({fzTotal,fxTotal,pelvis,leadFoot,driveFoot,scal
     driveResultant:Math.hypot(driveVertical,driveHorizontalWorld),
     shareLead:share,allocationMethod:contactPhase===1?'lead-airborne':contactPhase===3?'drive-airborne':'filed-support-point-proxy-both-supported'};
 }
+// Public, conventional centered moving average of up to five observed 2D positions.
+// Use current frame +/-2 only, and exclude temporally remote neighbors. A missing
+// center remains missing; this never invents a keypoint or repeats pose inference.
+function smoothPositionTrack(track,times){
+  return track.map((point,i)=>{
+    if(!point||!Number.isFinite(point.x)||!Number.isFinite(point.y))return null;
+    let sx=0,sy=0,count=0;
+    for(let j=Math.max(0,i-2);j<=Math.min(track.length-1,i+2);j++){
+      const near=track[j];
+      if(!near||!Number.isFinite(near.x)||!Number.isFinite(near.y))continue;
+      if(!Number.isFinite(times[j])||Math.abs(times[j]-times[i])>.16)continue;
+      sx+=near.x;sy+=near.y;count++;
+    }
+    return count>0?{x:sx/count,y:sy/count}:{x:point.x,y:point.y};
+  });
+}
 function computePublicMetrics(frames,params,width,heightPx){
   const times=frames.map(f=>f.t),flipX=params.direction==='left'?-1:1;
   const measured=parseMeasurements(frames,params,width,heightPx),scale=measured.metersPerPixel;
   // Hip midpoint is an accessible marker, not an anthropometric center of mass.
   const pointNames={pelvis: [23,24],thorax:[11,12],shoulderL:[11],shoulderR:[12],elbowL:[13],elbowR:[14],wristL:[15],wristR:[16],handTipL:[19],handTipR:[20]};
-  const points={};for(const [k,ids] of Object.entries(pointNames))points[k]=frames.map(f=>ids.length===2?middle(lookup(f.pose,ids[0]),lookup(f.pose,ids[1])):lookup(f.pose,ids[0]));
+  // Smooth positions BEFORE numerical differentiation, rather than smoothing
+  // inferred poses repeatedly. Pelvis midpoint remains only a 2D CoM proxy.
+  const points={};
+  for(const [k,ids] of Object.entries(pointNames)){
+    const raw=frames.map(f=>ids.length===2?middle(lookup(f.pose,ids[0]),lookup(f.pose,ids[1])):lookup(f.pose,ids[0]));
+    points[k]=smoothPositionTrack(raw,times);
+  }
+  // Foot support positions and ankle spacing use the same five-frame rule.
+  // Candidate contact events remain calculated from original pose observations.
+  const mirrored=params.mirrorSides==='yes';
+  const flipSide=index=>mirrored?(index===27?28:index===28?27:index===31?32:index===32?31:index):index;
+  const ankleTracks={};const supportTracks={};
+  for(const [side,ankleIndex,toeIndex] of [['left',27,31],['right',28,32]]){
+    const ankleId=flipSide(ankleIndex),toeId=flipSide(toeIndex);
+    ankleTracks[side]=smoothPositionTrack(frames.map(f=>lookup(f.pose,ankleId)),times);
+    supportTracks[side]=smoothPositionTrack(frames.map(f=>{
+      const ankle=lookup(f.pose,ankleId),toe=lookup(f.pose,toeId);
+      return ankle&&toe?middle(ankle,toe):(toe||ankle);
+    }),times);
+  }
   const pixelVelocity={};for(const k of Object.keys(points))pixelVelocity[k]=times.map((_,i)=>moment(points[k],i,times));
   // Basic three-point average is a conventional low-pass approximation, not a specialized estimator.
   function smooth(v){return v.map((x,i)=>{
@@ -303,12 +338,11 @@ function computePublicMetrics(frames,params,width,heightPx){
   }
   const ax=smooth(vx.map((_,i)=>diffNumeric(vx,i)));
   const az=smooth(vy.map((_,i)=>diffNumeric(vy,i)));
-  const wristIndex=params.hand==='left'?15:16;
-  const anchorFrame=frames.find(f=>lookup(f.pose,wristIndex));
-  const wristAnchor=anchorFrame?lookup(anchorFrame.pose,wristIndex)?.x:null;
+  const wristTrack=points[params.hand==='left'?'wristL':'wristR'];
+  const wristAnchor=wristTrack.find(Boolean)?.x??null;
   const contact=detectContactSequence(frames,params,width,heightPx,scale);
   const mapped=frames.map((frame,i)=>{
-    const p=frame.pose,wa=lookup(p,wristIndex),la=lookup(p,27),ra=lookup(p,28);
+    const p=frame.pose,wa=wristTrack[i],la=ankleTracks.left[i],ra=ankleTracks.right[i];
     const stride=la&&ra&&scale!=null?Math.abs(la.x-ra.x)*width*scale:null;
     const wristTravel=wa&&scale!=null&&Number.isFinite(wristAnchor)?Math.abs(wa.x-wristAnchor)*width*scale:null;
     const forceHorizontal=Number.isFinite(ax[i])?params.weight*ax[i]*flipX:null;
@@ -316,17 +350,11 @@ function computePublicMetrics(frames,params,width,heightPx){
     // It is NOT valid when a subject is airborne or external contacts are present.
     const forceVertical=Number.isFinite(az[i])?Math.max(0,params.weight*(G+az[i])):null;
     const forceTotal=Number.isFinite(forceHorizontal)&&Number.isFinite(forceVertical)?Math.hypot(forceHorizontal,forceVertical):null;
-    // Map foot roles from throwing arm. Anatomical landmark labels may be
-    // swapped for mirrored/source-inconsistent recordings, per user setting.
-    const mirrored=params.mirrorSides==='yes';
-    const flipSide=index=>mirrored?(index===27?28:index===28?27:index===31?32:index===32?31:index):index;
-    const leadIsLeft=params.hand==='right';
-    const footPt=left=>{
-      const ankle=lookup(p,flipSide(left?27:28));
-      const toe=lookup(p,flipSide(left?31:32));
-      return ankle&&toe?middle(ankle,toe):(toe||ankle);
-    };
-    const feet={lead:footPt(leadIsLeft),drive:footPt(!leadIsLeft)};
+    // Foot labels respect the thrower's handedness; smoothed support points
+    // share the centered averaging convention of the 2D pelvis proxy.
+    const leadSide=params.hand==='right'?'left':'right';
+    const driveSide=leadSide==='left'?'right':'left';
+    const feet={lead:supportTracks[leadSide][i],drive:supportTracks[driveSide][i]};
     const allocation=allocateFootForcesFiled({
       fzTotal:forceVertical,fxTotal:forceHorizontal,pelvis:points.pelvis[i],
       leadFoot:feet.lead,driveFoot:feet.drive,scale,width,heightPx,
@@ -887,7 +915,7 @@ async function snapshot(){
 }
 function exportCsv(){if(!stateReady()){notify('先に解析を実行してください');return;}
   const keys=['t','contactPhase','contactSource','footHeightDiffM','leadContact','driveContact','pelvisSpeed','thoraxSpeed','shoulderL','shoulderR','elbowL','elbowR','wristL','wristR','handTipL','handTipR','forceTotal','forceVertical','forceHorizontal','leadResultant','driveResultant','leadVertical','driveVertical','leadHorizontal','driveHorizontal','leadHorizontalWorld','driveHorizontalWorld','stride','wristTravel','energy','shareLead'];
-  const lines=['# FORM ANALYSIS Public Preview v1.6.6','# Simple single-pass, 2D hip-center proxy: NOT anatomical CoM','# Filed support-point load partition: projected pelvis-center and acceleration, adjusted for candidate foot contact; NOT measured foot GRF',`# height_cm=${state.config.height} weight_kg=${state.config.weight} sex(record-only)=${state.config.sex}`,'# Contact candidates: sequential foot motion + relative bilateral toe/heel/ankle height difference, 3 stable observations; 2D unvalidated heuristic', '# footHeightDiffM: positive means lead foot appears higher than drive; camera perspective, steps and mounds can misclassify support', '# leadHorizontal/driveHorizontal: inward-positive reference magnitudes (foot -> pelvis); actual per-foot horizontal direction NOT independently estimated', '# *HorizontalWorld: signed pitch-direction allocation, sums to forceHorizontal (not the inward-display convention)',`# contact_assumption=${state.analysis.contactAssumption}`,...state.analysis.events.map(e=>`# event=${e.foot}_${e.type},time_s=${e.t.toFixed(3)},quality=candidate`),keys.join(',')];
+  const lines=['# FORM ANALYSIS Public Preview v1.6.6','# Simple single-pass, 2D hip-center proxy: NOT anatomical CoM','# Position tracks: centered moving mean of current +/-2 frames (up to 5, within 0.16 seconds, no missing-center imputation); derivatives computed afterward','# Filed support-point load partition: projected pelvis-center and acceleration, adjusted for candidate foot contact; NOT measured foot GRF',`# height_cm=${state.config.height} weight_kg=${state.config.weight} sex(record-only)=${state.config.sex}`,'# Contact candidates: sequential foot motion + relative bilateral toe/heel/ankle height difference, 3 stable observations; 2D unvalidated heuristic', '# footHeightDiffM: positive means lead foot appears higher than drive; camera perspective, steps and mounds can misclassify support', '# leadHorizontal/driveHorizontal: inward-positive reference magnitudes (foot -> pelvis); actual per-foot horizontal direction NOT independently estimated', '# *HorizontalWorld: signed pitch-direction allocation, sums to forceHorizontal (not the inward-display convention)',`# contact_assumption=${state.analysis.contactAssumption}`,...state.analysis.events.map(e=>`# event=${e.foot}_${e.type},time_s=${e.t.toFixed(3)},quality=candidate`),keys.join(',')];
   for(const row of state.analysis.samples)lines.push(keys.map(k=>
     Number.isFinite(row[k])?row[k].toFixed(5):typeof row[k]==='string'?row[k]:'').join(','));
   const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='FORM_ANALYSIS_PUBLIC_v1.6.5.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notify('CSVを保存しました');

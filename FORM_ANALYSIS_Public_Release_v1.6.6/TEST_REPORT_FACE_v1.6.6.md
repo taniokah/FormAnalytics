@@ -5,3 +5,8 @@
 - Face landmarks drawn only where `lookup()` confirms sufficient visibility/presence; low-confidence segments are omitted.
 - Small or geometrically implausible ovals are suppressed. The oval is an illustration, not a measured head boundary.
 - Service Worker cache key and script URLs updated to invalidate earlier v1.6.6 assets.
+
+## Subsequent display-only change: no oval/head outline
+- Removed the synthetic head ellipse while preserving the 0–10 facial landmarks and sparse connections.
+- Skeleton OFF continues to hide facial markers and lines.
+- Static JS syntax and release package checks performed; no physical iPhone test.

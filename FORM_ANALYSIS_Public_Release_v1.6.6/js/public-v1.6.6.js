@@ -604,7 +604,7 @@ function updateVideoLayers(){
   arrowButton.setAttribute('aria-label',state.showArrows?'反力矢印を非表示にする':'反力矢印を表示する');
 }
 // Face landmarks 0-10 are already returned by MediaPipe Pose Landmarker.
-// This is a schematic 2D head contour, not a facial mesh or anatomical measurement.
+// Facial keypoints and light connecting segments only; no synthetic head contour.
 // Each marker and segment is drawn only when its own landmarks pass lookup().
 function drawHeadOverlay(ctx, position, dpr){
   const p=Array.from({length:11},(_,i)=>position(i));
@@ -617,44 +617,6 @@ function drawHeadOverlay(ctx, position, dpr){
   ctx.strokeStyle='rgba(193,255,157,.8)';
   ctx.lineWidth=Math.max(1,1.35*dpr);
   ctx.lineCap='round';ctx.lineJoin='round';
-  // Both frontal and profile faces: fit a small oval around visible features.
-  // Use ears to anchor the width if available; otherwise use visible eyes/nose/mouth.
-  const earL=p[7],earR=p[8],nose=p[0];
-  if(face.length>=3&&(nose||p[2]||p[5])&&(earL||earR||p[9]||p[10])){
-    let cx,cy,rx,ry,rotation=0;
-    const pts=face.map(q=>q.v);
-    const xs=pts.map(q=>q.x),ys=pts.map(q=>q.y);
-    const minX=Math.min(...xs),maxX=Math.max(...xs);
-    const minY=Math.min(...ys),maxY=Math.max(...ys);
-    cx=(minX+maxX)/2;cy=(minY+maxY)/2;
-    const width=maxX-minX,height=maxY-minY;
-    rx=Math.max(width*.58,height*.7);
-    ry=Math.max(rx*1.13,height*.88);
-    if(earL&&earR){
-      const dx=earR.x-earL.x,dy=earR.y-earL.y;
-      const earSpan=Math.hypot(dx,dy);
-      if(earSpan>0){
-        cx=(earL.x+earR.x)/2;
-        cy=(earL.y+earR.y)/2-0.07*earSpan;
-        rx=Math.max(rx,earSpan*.53);
-        ry=Math.max(ry,rx*1.13);
-        rotation=Math.atan2(dy,dx);
-      }
-    }else if((earL||earR)&&nose){
-      const ear=earL||earR;
-      const span=Math.hypot(nose.x-ear.x,nose.y-ear.y);
-      cx=(ear.x+nose.x)/2;
-      cy=(ear.y+nose.y)/2-0.12*span;
-      rx=Math.max(rx,span*.75);
-      ry=Math.max(ry,rx*1.18);
-    }
-    const shL=position(11),shR=position(12);
-    const shoulderSpan=shL&&shR?Math.hypot(shR.x-shL.x,shR.y-shL.y):null;
-    // Suppress spurious head ovals from stray detections or extremely tiny heads.
-    if(rx>=3.5*dpr&&(!shoulderSpan||rx*2<=shoulderSpan*1.05)){
-      ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,rotation,0,2*Math.PI);ctx.stroke();
-    }
-  }
   // Light facial skeleton, intentionally less prominent than the body skeleton.
   for(const [a,b] of [[7,3],[3,2],[2,1],[1,0],[0,4],[4,5],[5,6],[6,8],[9,10]])line(a,b);
   for(const {v,i} of face){

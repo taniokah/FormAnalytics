@@ -881,3 +881,14 @@ html.fullscreen-fallback-active body { overflow:hidden !important; }
 .viewer.is-analyzing .record-toolbar{pointer-events:none;opacity:.5}
 .viewer.is-exporting .transport,.viewer.is-exporting .media-actions,.viewer.is-exporting .viewer-foot{pointer-events:none;opacity:.6}
 .app.is-exporting .bottom-nav,.app.is-exporting .chart-actions{pointer-events:none;opacity:.7}
+
+/* Optional source-audio export; visually matches the small export button. */
+.record-toolbar .record-audio{display:inline-flex;align-items:center;justify-content:center;gap:5px;flex:0 0 auto;color:#e4f4f0;font-size:11px;font-weight:700;white-space:nowrap;cursor:pointer;user-select:none;}
+.record-toolbar .record-audio input{width:14px;height:14px;accent-color:#b8ef67;margin:0;cursor:pointer;flex:0 0 auto;}
+.record-toolbar .record-audio:has(input:disabled){opacity:.6;cursor:not-allowed;}
+@media(max-width:430px){.record-toolbar .record-audio{font-size:10px;gap:3px;}.record-toolbar .record-audio input{width:13px;height:13px;}}
+
+@media(max-width:430px){
+ .record-toolbar:has(.record-link:not([hidden])) .record-status{display:none;}
+ .record-toolbar .record-link{overflow:hidden;text-overflow:ellipsis;max-width:140px;}
+}

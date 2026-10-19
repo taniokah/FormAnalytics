@@ -12,7 +12,7 @@
 
 ### Exporting annotated video (v1.6.7)
 
-Select **↓ Save video** above the playback controls. The current **Video / Skeleton / Force arrows** visibility choices are applied to the recorded video. The analyzed segment (up to 20 seconds) is exported without audio. Encoding takes approximately the video's playback duration. Output is MP4 or WebM depending on browser support. Recording is performed locally and is limited to 1280px on the longest side and 30fps. Safari on iPhone is not yet device-tested.
+Select **↓ Save video** above the playback controls. The current **Video / Skeleton / Force arrows** visibility choices are applied to the recorded video. The analyzed segment (up to 20 seconds) is exported without audio by default. Check **音声あり (Include audio)** beside the export button to attempt to include the original video audio. Audio recording requires browser support for Web Audio and MediaRecorder, and may not work on all iPhone Safari versions. Encoding takes approximately the video's playback duration. Output is MP4 or WebM depending on browser support. Recording is performed locally and is limited to 1280px on the longest side and 30fps. Safari on iPhone is not yet device-tested.
 
 ### Overview
 

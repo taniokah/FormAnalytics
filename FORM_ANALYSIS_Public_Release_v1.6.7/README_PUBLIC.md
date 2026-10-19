@@ -77,4 +77,4 @@ The original FORM ANALYSIS components are distributed under the FORM ANALYSIS Re
 
 
 ## v1.6.7 動画保存
-動画・骨格・床反力矢印の各表示設定を保持して解析区間を録画します。動画の音声は保存されません。MediaRecorderに対応するブラウザが必要です。
+動画・骨格・床反力矢印の各表示設定を保持して解析区間を録画します。音声は初期状態では保存されません。「音声あり」にチェックすると、対応するブラウザでは元動画の音声も録画します（Web AudioとMediaRecorderが必要）。MediaRecorderに対応するブラウザが必要です。

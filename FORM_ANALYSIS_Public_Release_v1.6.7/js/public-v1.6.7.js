@@ -912,18 +912,54 @@ async function analyze(){
   }catch(e){notify('解析エラー：'+e.message,true);console.error(e);}
   finally{hideAnalysisProgress();state.analyzing=false;state.abort=null;$('navAnalyze').disabled=false;$('cancelAnalysis').hidden=true;render();}
 }
-// Video export: browser-local real-time compositing of the decoded video and
-// its existing pose / force overlay. No server upload and no repeat pose inference.
-// Audio is intentionally not captured; HTMLVideoElement.captureStream is absent on Safari.
-let activeVideoExport=null, lastVideoExportURL=null;
-function exportMimeType(){
+// Video export: on-device compositing with optional source-video audio.
+// MediaElementAudioSourceNode works without video.captureStream() (unavailable
+// in some Safari versions). It is created lazily, only on an explicit audio-on
+// save click, and reused because an element can only have one MediaElementSource.
+let activeVideoExport=null, lastVideoExportURL=null, exportAudioGraph=null;
+function exportMimeType(withAudio=false){
   if(typeof MediaRecorder==='undefined')return null;
-  const candidates=['video/mp4;codecs=avc1.42E01E','video/mp4','video/webm;codecs=vp8','video/webm;codecs=vp9','video/webm'];
+  const candidates=withAudio?
+    // Generic MP4 can result in unusual VP9+Opus in MP4 on Chromium.
+    // Prefer explicit H.264/AAC; otherwise WebM+Opus before generic MP4.
+    ['video/mp4;codecs="avc1.42E01E,mp4a.40.2"',
+     'video/webm;codecs="vp8,opus"','video/webm;codecs="vp9,opus"',
+     'video/mp4','video/webm']:
+    ['video/mp4;codecs=avc1.42E01E','video/mp4','video/webm;codecs=vp8','video/webm;codecs=vp9','video/webm'];
   return candidates.find(t=>MediaRecorder.isTypeSupported(t))||'';
+}
+function prepareExportAudio(){
+  const AudioCtor=window.AudioContext||window.webkitAudioContext;
+  if(!AudioCtor)throw Error('このブラウザは動画の音声録音に対応していません。音声なしで保存してください。');
+  if(!exportAudioGraph){
+    const context=new AudioCtor();
+    try{
+      const source=context.createMediaElementSource(video);
+      const monitor=context.createGain();
+      // Preserve a playback output path after the first sound-enabled export.
+      source.connect(monitor);monitor.connect(context.destination);
+      exportAudioGraph={context,source,monitor};
+    }catch(e){void context.close().catch(()=>{});throw e;}
+  }
+  const {context,source,monitor}=exportAudioGraph;
+  const sink=context.createMediaStreamDestination();
+  source.connect(sink);
+  const track=sink.stream.getAudioTracks()[0];
+  if(!track){source.disconnect(sink);throw Error('動画の音声トラックを録画用に作成できませんでした');}
+  // Keep the speakers quiet during export; audio continues to the recording sink.
+  monitor.gain.value=0;
+  // Called synchronously from the save button's user gesture, before any await.
+  const ready=context.resume();
+  return {track,ready,release(){
+    try{source.disconnect(sink)}catch{}
+    try{track.stop()}catch{}
+    monitor.gain.value=0;
+  }};
 }
 function updateExportToolbar(){
   const button=$('saveVideo');
   const busy=!!activeVideoExport;
+  $('recordAudio').disabled=busy;
   button.disabled=state.analyzing||state.loadingVideo||state.mode==='empty'||!video.videoWidth||(!busy&&(typeof MediaRecorder==='undefined'||typeof HTMLCanvasElement.prototype.captureStream!=='function'));
   button.classList.toggle('is-recording',busy);
   button.textContent=busy?'■ 保存を中止':'↓ 動画保存';
@@ -962,7 +998,9 @@ async function exportVideo(){
   if(!Number.isFinite(duration)||duration<.1){notify('保存する動画区間がありません',true);return;}
   if(!state.showVideo&&!state.showPose&&!state.showArrows){notify('動画・骨格・反力矢印がすべてOFFです。少なくとも1つをONにしてください',true);return;}
   if(!state.showVideo&&!state.analysis){notify('動画OFFでの保存には解析結果が必要です',true);return;}
-  const mime=exportMimeType();
+  const withAudio=$('recordAudio').checked;
+  const audioLabel=withAudio?'音声あり':'音声なし';
+  const mime=exportMimeType(withAudio);
   // Keep longest side <=1280px to reduce iPhone memory and encoding failures.
   const srcW=video.videoWidth,srcH=video.videoHeight,shrink=Math.min(1,1280/Math.max(srcW,srcH));
   const exportCanvas=document.createElement('canvas');
@@ -974,7 +1012,8 @@ async function exportVideo(){
   stopPlay();
   if(lastVideoExportURL){URL.revokeObjectURL(lastVideoExportURL);lastVideoExportURL=null;}
   const anchor=$('recordDownload');anchor.hidden=true;anchor.removeAttribute('href');
-  let recorder,stream,raf=0,interval=0,watchdog=0,saveError=null,finishResolve;
+  let recorder,stream,audioSetup=null,raf=0,interval=0,watchdog=0,saveError=null,finishResolve;
+  const previousMuted=video.muted;
   let canceled=false,finishing=false,lastProgress=0,lastMediaTime=-1,lastAdvance=performance.now();
   const session={cancel(){canceled=true;if(recorder?.state==='recording')recorder.stop();}};
   activeVideoExport=session;
@@ -985,10 +1024,22 @@ async function exportVideo(){
   for(const id of disableIds)$(id).disabled=true;
   const stopRecorder=()=>{if(finishing)return;finishing=true;cancelAnimationFrame(raf);if(recorder?.state==='recording')recorder.stop();};
   try{
+    // AudioContext.resume must be initiated in the same user gesture that
+    // initiated export; do not move this below the first async seek.
+    if(withAudio)audioSetup=prepareExportAudio();
     await seekTo(start,new AbortController().signal);
+    if(audioSetup){
+      await Promise.race([audioSetup.ready,new Promise((_,reject)=>setTimeout(()=>reject(Error('音声処理の起動がタイムアウトしました。音声なしで保存してください。')),10000))]);
+      if(exportAudioGraph.context.state!=='running')throw Error('音声処理を開始できませんでした。もう一度保存ボタンを押してください。');
+      // The media element must be unmuted while recording. Muted sources
+      // produce silence in Web Audio even if a destination track exists.
+      video.muted=false;
+    }
     state.t=video.currentTime;compositedVideoFrame(context,exportCanvas);
     stream=exportCanvas.captureStream(30);
     if(!stream?.getVideoTracks().length)throw Error('動画を録画するトラックを作成できませんでした');
+    if(audioSetup)stream.addTrack(audioSetup.track);
+    if(withAudio&&!stream.getAudioTracks().length)throw Error('録画用の音声トラックを取得できませんでした');
     const chunks=[];
     const options=mime?{mimeType:mime,videoBitsPerSecond:2500000}:{videoBitsPerSecond:2500000};
     recorder=new MediaRecorder(stream,options);
@@ -1003,7 +1054,7 @@ async function exportVideo(){
       };
     });
     recorder.start(1000);
-    $('recordStatus').textContent='録画中：0%（音声なし）';
+    $('recordStatus').textContent=`録画中：0%（${audioLabel}）`;
     const paint=now=>{
       if(finishing||canceled)return;
       if(video.readyState>=2){
@@ -1011,7 +1062,7 @@ async function exportVideo(){
         compositedVideoFrame(context,exportCanvas);
         if(now-lastProgress>250){
           const pct=Math.floor(100*clamp((state.t-start)/duration,0,1));
-          $('recordStatus').textContent=`録画中 ${pct}% / ${duration.toFixed(1)}秒（音声なし）`;
+          $('recordStatus').textContent=`録画中 ${pct}% / ${duration.toFixed(1)}秒（${audioLabel}）`;
           lastProgress=now;
         }
         if(state.t>lastMediaTime+.001){lastAdvance=now;lastMediaTime=state.t;}
@@ -1025,7 +1076,7 @@ async function exportVideo(){
     // should never leave the Save button indefinitely disabled.
     watchdog=setTimeout(()=>{if(!finishing){saveError=Error('動画保存が時間内に完了しませんでした');stopRecorder();}},Math.max(30000,Math.ceil(duration*3000+15000)));
     if(canceled){stopRecorder();}
-    else {await video.play();state.playing=true;$('play').textContent='Ⅱ';}
+    else {try{await video.play();}catch(e){if(withAudio)throw Error('ブラウザが音声付き再生を許可しませんでした。音声なしにして保存するか、Safariの再生制限を確認してください。');throw e;}state.playing=true;$('play').textContent='Ⅱ';}
     const blob=await recorded;
     if(canceled){$('recordStatus').textContent='保存を中止しました';return;}
     if(!blob.size)throw Error('録画ファイルが空でした');
@@ -1033,7 +1084,7 @@ async function exportVideo(){
     const name=`FORM_ANALYSIS_Public_v1.6.7_${Date.now()}.${ext}`;
     lastVideoExportURL=URL.createObjectURL(blob);
     anchor.href=lastVideoExportURL;anchor.download=name;anchor.hidden=false;
-    $('recordStatus').textContent=`${ext.toUpperCase()}・${(blob.size/1048576).toFixed(1)} MB・音声なし`;
+    $('recordStatus').textContent=`${ext.toUpperCase()}・${(blob.size/1048576).toFixed(1)} MB・${audioLabel}`;
     // Automatic download where supported. Keep an explicit link for iOS Safari.
     anchor.click();
     notify(`動画を作成しました（${ext.toUpperCase()}）。保存されない場合は「保存した動画を開く」を押してください。`);
@@ -1044,6 +1095,9 @@ async function exportVideo(){
   }finally{
     cancelAnimationFrame(raf);clearTimeout(watchdog);clearInterval(interval);
     try{stream?.getTracks().forEach(track=>track.stop())}catch{}
+    try{audioSetup?.release()}catch{}
+    video.muted=previousMuted;
+    if(exportAudioGraph)exportAudioGraph.monitor.gain.value=previousMuted?0:1;
     if(state.playing)stopPlay();
     try{await seekTo(oldTime,new AbortController().signal)}catch{}
     state.t=Number.isFinite(video.currentTime)?video.currentTime:oldTime;

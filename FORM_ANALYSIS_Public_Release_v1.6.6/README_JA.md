@@ -2,7 +2,7 @@
 
 **動画から投球フォームを可視化する、ブラウザベースのマーカーレス動作解析ツール。**
 
-**公開版 v1.6.5** · **研究・教育目的は無償／商用利用は別途有償契約が必要** · [English README](./README.md)
+**公開版 v1.6.6** · **研究・教育目的は無償／商用利用は別途有償契約が必要** · [English README](./README.md)
 
 > **公開プレビュー**  
 > 推定結果は参考値です。力板等による実測や、医学的・競技的な診断を代替するものではありません。
@@ -13,12 +13,12 @@
 
 FORM ANALYSIS は、スマートフォンなどで撮影した投球動画を使い、姿勢推定、身体各部の速度、脚別の推定床反力などをブラウザ内で計算・可視化するアプリケーションです。解析用動画を外部の解析サーバーへ送信せず、端末上で処理します。
 
-**公開版 v1.6.5** は、標準的な2D姿勢推定と簡易的な力学モデルに基づくプレビューです。公開されている結果は、精密な3次元計測や検証済みの床反力計測を意味するものではありません。
+**公開版 v1.6.6** は、標準的な2D姿勢推定と簡易的な力学モデルに基づくプレビューです。公開されている結果は、精密な3次元計測や検証済みの床反力計測を意味するものではありません。
 
 ### アプリを開く
 
-- [公開版 v1.6.5 を開く（GitHub Pages）](https://taniokah.github.io/FormAnalytics/FORM_ANALYSIS_Public_Release_v1.6.5/)
-- [公開版 v1.6.5 のファイルを見る（GitHub）](./FORM_ANALYSIS_Public_Release_v1.6.5/)
+- [公開版 v1.6.6 を開く（GitHub Pages）](https://taniokah.github.io/FormAnalytics/FORM_ANALYSIS_Public_Release_v1.6.6/)
+- [公開版 v1.6.6 のファイルを見る（GitHub）](./FORM_ANALYSIS_Public_Release_v1.6.6/)
 
 GitHub Pages の公開設定、ファイル配置、ブラウザのキャッシュ状況によっては反映に時間がかかることがあります。
 
@@ -72,9 +72,9 @@ GitHub Pages の公開設定、ファイル配置、ブラウザのキャッシ�
 
 論文・学会発表・研究報告で本アプリの解析結果を使用する場合は、**使用したソフトウェアのバージョン**を明示し、次の「アプリケーション」の書誌情報を引用してください。研究手法の背景について記述する場合には、あわせて関連するSIT2026・WCB2026の発表を引用してください。
 
-**アプリケーション（公開版 v1.6.5）**
+**アプリケーション（公開版 v1.6.6）**
 
-> 谷岡 広樹 (2026)．*FORM ANALYSIS*（公開版 v1.6.5）[コンピュータソフトウェア]．GitHub．https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.5
+> 谷岡 広樹 (2026)．*FORM ANALYSIS*（公開版 v1.6.6）[コンピュータソフトウェア]．GitHub．https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.6
 
 **関連研究：SIT2026（日本語発表）**
 
@@ -89,10 +89,10 @@ GitHub Pages の公開設定、ファイル配置、ブラウザのキャッシ�
 ```bibtex
 @misc{tanioka2026formanalysis,
   author       = {Tanioka, Hiroki},
-  title        = {{FORM ANALYSIS} (Public Release v1.6.5)},
+  title        = {{FORM ANALYSIS} (Public Release v1.6.6)},
   year         = {2026},
   howpublished = {Computer software, GitHub repository},
-  url          = {https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.5}
+  url          = {https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.6}
 }
 
 @inproceedings{tanioka2026sit,
@@ -134,3 +134,7 @@ GitHub Pages の公開設定、ファイル配置、ブラウザのキャッシ�
 本ソフトウェアおよび推定結果は**無保証**で提供されます。推定値の精度・再現性・目的適合性は保証されません。第三者の権利については [THIRD_PARTY_NOTICE.md](./THIRD_PARTY_NOTICE.md) をご確認ください。
 
 **管理者：[ @taniokah ](https://github.com/taniokah)**
+
+### 解析進捗表示（v1.6.6）
+
+解析中は動画の再生映像を表示せず、**完了した推定フレーム数 ÷ 予定フレーム数**から計算したプログレスバーを表示します。姿勢推定は従来どおり1回のみ実行し、各サンプルフレームにつき1回だけ姿勢推定します。モデル選択を含む設定画面は従来のままです。

@@ -7,15 +7,15 @@
 <meta content="#f4f7f6" name="theme-color"/>
 <link href="./manifest.webmanifest" rel="manifest"/>
 <meta content="FORM ANALYSIS 公開プレビュー｜動画から姿勢・並進速度・全身参考支持反力を端末内で計算" name="description"/>
-<title>FORM ANALYSIS — Public Preview v1.6.5</title>
-<link href="./css/public-v1.6.5.css?rev=20261017ios3" rel="stylesheet"/>
+<title>FORM ANALYSIS — Public Preview v1.6.6</title>
+<link href="./css/public-v1.6.6.css?rev=20261019progress166" rel="stylesheet"/>
 <link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%230c2936'/%3E%3Cpath d='M9 30V10h22' stroke='%23c7f36b' stroke-width='6' fill='none'/%3E%3C/svg%3E" rel="icon"/>
 </head>
 <body>
 <div class="app" id="app">
 <section aria-label="利用ガイド" class="welcome" id="welcome">
 <div class="guide-shell">
-<div class="guide-mark"><span class="guide-logo">F</span><span>FORM ANALYSIS</span><span class="guide-version">公開版 v1.6.5</span></div>
+<div class="guide-mark"><span class="guide-logo">F</span><span>FORM ANALYSIS</span><span class="guide-version">公開版 v1.6.6</span></div>
 <div class="guide-heading"><span class="guide-eyebrow">かんたん3ステップ</span><h1>動画を選んで、フォームを解析</h1>
 <p>普段のカメラアプリで撮影した投球動画を選ぶだけ。解析はスマートフォン・タブレット内で実行します。</p></div>
 <div aria-label="操作手順" class="guide-steps">
@@ -40,7 +40,7 @@
 <p aria-live="polite" class="guide-tip" id="runtimeStatus" role="status">推奨：横方向から全身が映る動画。姿勢推定モデルは同一配信元から取得し、計算は端末内で行います。</p>
 <p class="guide-tip">推奨：横から全身が映る画角・60fps以上。動画は解析サーバーへ送信されません。姿勢推定モデル・WASMはアプリと同じ配信元から取得し、端末にキャッシュします。外部CDNは使用しません。</p>
 </div>
-<p class="guide-foot">公開プレビューでは標準的な2Dキーポイント計算と出願済み支持点荷重配分モデルを利用した一般的な力学計算を使います。独自の高度な接地・離地判定、独自重心補正、2パス補正、回旋角速度、リリース推定は提供しません。接地イベントは標準的な2D足部移動に基づく簡易候補で、各脚の反力は推定参考値です。表示値は実測・診断結果ではありません。</p>
+<p class="guide-foot">公開プレビューでは標準的な2Dキーポイント計算と出願済み支持点荷重配分モデルを利用した一般的な力学計算を使います。公開版は簡易的な参考推定を目的としており、研究向けの高度な解析機能は含みません。接地イベントは標準的な2D足部移動に基づく簡易候補で、各脚の反力は推定参考値です。表示値は実測・診断結果ではありません。</p>
 </div>
 </section>
 <main aria-label="投球フォーム解析" class="workspace hidden" id="workspace">
@@ -56,6 +56,17 @@
 <button aria-label="全画面表示にする" aria-pressed="false" id="expandButton" title="全画面表示にする" type="button">⛶</button>
 </div>
 <div class="watermark" id="watermark">公開版：姿勢・並進速度の参考計測</div>
+<div class="analysis-progress" id="analysisProgress" hidden aria-live="off" aria-label="動画を解析中">
+<div class="analysis-progress-content">
+<div class="analysis-progress-symbol" aria-hidden="true">⌁</div>
+<strong id="analysisProgressTitle">動画を解析しています</strong>
+<p id="analysisProgressStage">姿勢推定モデルを準備中…</p>
+<div class="analysis-progress-track" id="analysisProgressTrack" role="progressbar" aria-label="解析進捗" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="analysis-progress-fill" id="analysisProgressFill"></div></div>
+<div class="analysis-progress-numbers"><b id="analysisProgressPercent">0%</b><span id="analysisProgressCounts">準備中</span></div>
+<p class="analysis-progress-footnote">動画は端末内で処理しています。解析中の映像は表示しません。</p>
+<button id="analysisProgressCancel" class="analysis-progress-cancel" type="button">解析を中止</button>
+</div>
+</div>
 </div>
 <div class="transport">
 <button aria-label="再生・停止" class="play" id="play">▶</button>
@@ -123,7 +134,7 @@
 </dialog>
 <dialog class="dialog" id="helpDialog">
 <form method="dialog">
-<div class="dialog-head"><h2>FORM ANALYSIS 公開プレビュー v1.6.5</h2><button aria-label="閉じる" value="close">✕</button></div>
+<div class="dialog-head"><h2>FORM ANALYSIS 公開プレビュー v1.6.6</h2><button aria-label="閉じる" value="close">✕</button></div>
 
 
 
@@ -140,6 +151,6 @@
 </dialog>
 <div aria-live="polite" class="actionbar transient" id="actionbar" role="status"><span id="message">画面起動中…</span><button hidden="" id="runAnalysis">解析開始</button><button hidden="" id="cancelAnalysis">中止</button><button aria-label="通知を閉じる" id="dismissMessage" title="通知を閉じる" type="button">✕</button></div>
 <input accept="video/*,.mp4,.mov,.m4v,.webm" aria-label="動画ファイルを選択" class="native-file-input" id="videoFile" type="file"/>
-<script defer="" src="./js/public-v1.6.5.js?rev=20261017ios3"></script>
+<script defer="" src="./js/public-v1.6.6.js?rev=20261019progress166"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
-# FORM ANALYSIS Public Preview v1.6.5
+# FORM ANALYSIS Public Preview v1.6.6
 
-This public preview uses a 2D single-pass pose detector with approximate pelvis center, filed support-point load allocation and an elementary, unvalidated sequential foot-motion heuristic. No unreleased 2-pass research contact model, Chandler coefficient correction, segment rotation model or release localization is included.
+This public preview uses a 2D single-pass pose detector with approximate pelvis center, filed support-point load allocation and an elementary, unvalidated sequential foot-motion heuristic. Advanced non-public research algorithms are not distributed in this repository.
 
 ## Changes
 
@@ -31,29 +31,40 @@ Run using start_mac.command or start_windows.bat (Python 3). All JavaScript, WAS
 - Terminology in the UI consistently uses 床反力 rather than 地面反力.
 - Chart right-axis heading is 床反力 (N). No estimation formulas changed.
 
-## v1.6.5 changes
+## v1.6.6 changes
 - Graph series toggles display a playback-synchronized value and its unit (e.g. 踏込 合力 / 45.7 N).
 - Combined left/right metrics show both values in their single tab.
 - On narrow screens, the tabs scroll horizontally rather than shrink into illegibility; graph minimum height stays at 320 px on iPhone.
 - After leaving the 20-second analyzed interval, displayed sample values become “—” (no extrapolation).
 - Summary metric cards keep their existing behavior; force formulas and CSV series are unchanged.
 
-### v1.6.5 再作成版の画面
+### v1.6.6 再作成版の画面
 カードは名称と数値・単位の2行で表示します。系列選択ボタンも2行で、スマートフォンでの高さはv1.6.1と同じ30pxです。系列ボタンは横にスクロールできます。
 
-## v1.6.5 フルスクリーン操作
+## v1.6.6 フルスクリーン操作
 
 全画面ボタンはプレイヤー全体（動画・オーバーレイ・再生コントローラ・ステータス）を全画面表示します。同じボタンを再度押すと通常サイズに戻ります。Escape キーでも解除できます。iPhone Safari 等で標準 Fullscreen API が利用できない場合は、画面全体を使う CSS フォールバックに切り替わります。全画面中も再生、一時停止、シーク、コマ送り・戻しを利用できます。
 
 ホーム画面から投球方向（画面右／画面左）と投球腕（右投げ／左投げ）を指定できます。これらは解析設定にも反映されます。
 
-## v1.6.5 相対足高補助判定
+## v1.6.6 相対足高補助判定
 
 公開版は脚の局所動作時系列に加えて、左右の踵・つま先双方の相対的な画面上の高さ（足首も確認可能な場合は補助）を使い、上方の足が3フレーム以上連続して持ち上がったとき離地候補とします。床反力の脚別配分・グラフ・CSVに反映します。足の前後位置による遠近差、マウンド、段差、カメラ傾斜などで誤判定します。接地イベントは確定判定ではありません。
 
-### iPhone動画読込時の動作（v1.6.5）
+### iPhone動画読込時の動作（v1.6.6）
 動画選択直後、メタデータ取得まで最大180秒待機し、経過秒を表示します。ファイル選択画面が閉じること自体はiOS標準動作です。3分経過や対応外形式の場合は読込エラーを画面内に残します。iCloud上の動画は先にiPhone本体へダウンロードしてから選択してください。非公開の接地・離地判定法は含まず、足部動作と左右高低差の簡易候補判定を用いています。
 
-## 脚別の水平床反力の向き（v1.6.5 再修正版）
+## 脚別の水平床反力の向き（v1.6.6 再修正版）
 公開版では、踏込足（F1）・軸足（F2）のいずれも**足から骨盤中心へ向かう向きを正**として脚別水平床反力を表示します。表示される値はその向きを仮定した水平成分の参考大きさであり、現行モデルが各足の実際の水平方向を独立に識別・測定したものではありません。
 一方、CSV の `leadHorizontalWorld`・`driveHorizontalWorld` は**投球方向を正**とする符号付きの配分成分で、こちらの合計は `forceHorizontal` と一致します。脚別水平表示列と混同しないでください。
+
+
+## License / 利用許諾
+
+FORM ANALYSIS独自部分には [FORM ANALYSIS Research & Non-Commercial License v1.0](./LICENSE) が適用されます。研究・教育目的の非商用利用は無償です。商用利用には事前の有償契約が必要です。
+
+The original FORM ANALYSIS components are distributed under the FORM ANALYSIS Research & Non-Commercial License v1.0. Non-commercial research and educational use is free of charge; Commercial Use requires a separate paid written agreement in advance. See LICENSE and LICENSE_JA.md. Third-party components retain their own licenses.
+
+## v1.6.6 解析中の表示
+
+従来の単一推定（各フレーム1回のみ）を変更せず、解析中のプレビューをプログレスバーに切り替えます。バーは完了済み推定フレーム数に基づき更新し、解析中止にも対応します。姿勢推定モデルの選択・解析設定はv1.6.5と同一です。

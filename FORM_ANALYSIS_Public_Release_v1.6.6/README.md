@@ -2,7 +2,7 @@
 
 **A browser-based, markerless tool for visualizing baseball pitching mechanics from video.**
 
-**Public Release v1.6.5** · **Free for non-commercial research and education / Paid license required for commercial use** · [日本語 README](./README_JA.md)
+**Public Release v1.6.6** · **Free for non-commercial research and education / Paid license required for commercial use** · [日本語 README](./README_JA.md)
 
 > **Public preview**  
 > Results are approximate estimates, not force-plate measurements or medical/performance diagnoses.
@@ -13,12 +13,12 @@
 
 FORM ANALYSIS is a browser-based application for visualizing baseball pitching mechanics from video recorded with a smartphone or other camera. It estimates pose, motion-derived velocities, and approximate per-foot ground reaction forces (GRFs) **locally in the browser**, without uploading the selected video to an analysis server.
 
-**Public Release v1.6.5** is a preview based on standard 2D pose estimation and simplified mechanics. It is not a validated 3D motion-capture or force-plate measurement system.
+**Public Release v1.6.6** is a preview based on standard 2D pose estimation and simplified mechanics. It is not a validated 3D motion-capture or force-plate measurement system.
 
 ### Open the app
 
-- [Launch Public Release v1.6.5 (GitHub Pages)](https://taniokah.github.io/FormAnalytics/FORM_ANALYSIS_Public_Release_v1.6.5/)
-- [Browse the v1.6.5 files (GitHub)](./FORM_ANALYSIS_Public_Release_v1.6.5/)
+- [Launch Public Release v1.6.6 (GitHub Pages)](https://taniokah.github.io/FormAnalytics/FORM_ANALYSIS_Public_Release_v1.6.6/)
+- [Browse the v1.6.6 files (GitHub)](./FORM_ANALYSIS_Public_Release_v1.6.6/)
 
 GitHub Pages configuration, deployment propagation, or browser caching may affect availability of the latest files.
 
@@ -73,9 +73,9 @@ Initial setup requires the browser to download application and model assets. Off
 
 If you report results obtained with this application in a paper, presentation, or research report, **cite the specific software version used**. When discussing the underlying research, also cite the relevant conference presentations below as appropriate.
 
-**Software (Public Release v1.6.5)**
+**Software (Public Release v1.6.6)**
 
-> Tanioka, H. (2026). *FORM ANALYSIS* (Public Release v1.6.5) [Computer software]. GitHub. https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.5
+> Tanioka, H. (2026). *FORM ANALYSIS* (Public Release v1.6.6) [Computer software]. GitHub. https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.6
 
 **Related research — SIT2026**
 
@@ -92,10 +92,10 @@ The **public application's implementation and validation conditions are not nece
 ```bibtex
 @misc{tanioka2026formanalysis,
   author       = {Tanioka, Hiroki},
-  title        = {{FORM ANALYSIS} (Public Release v1.6.5)},
+  title        = {{FORM ANALYSIS} (Public Release v1.6.6)},
   year         = {2026},
   howpublished = {Computer software, GitHub repository},
-  url          = {https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.5}
+  url          = {https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.6}
 }
 
 @inproceedings{tanioka2026sit,
@@ -138,3 +138,7 @@ The Software and all estimates are provided **AS IS**, without warranty of accur
 ---
 
 **Maintained by [@taniokah](https://github.com/taniokah)**
+
+### Analysis progress (v1.6.6)
+
+During analysis, a determinate progress bar replaces the playing video preview. The percentage reflects **completed frame inferences divided by the total scheduled frames**. The pose model and original single-pass calculation are unchanged; the application runs a single pose inference per sampled frame. The existing model-selection settings are unchanged.

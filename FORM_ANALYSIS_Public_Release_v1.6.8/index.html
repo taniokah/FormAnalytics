@@ -8,7 +8,7 @@
 <link href="./manifest.webmanifest" rel="manifest"/>
 <meta content="FORM ANALYSIS 公開プレビュー｜動画から姿勢・並進速度・全身参考支持反力を端末内で計算" name="description"/>
 <title>FORM ANALYSIS — Public Preview v1.6.8</title>
-<link href="./css/public-v1.6.8.css?rev=20261020smoothchoice168" rel="stylesheet"/>
+<link href="./css/public-v1.6.8.css?rev=20261020integrated168" rel="stylesheet"/>
 <link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%230c2936'/%3E%3Cpath d='M9 30V10h22' stroke='%23c7f36b' stroke-width='6' fill='none'/%3E%3C/svg%3E" rel="icon"/>
 </head>
 <body>
@@ -119,7 +119,7 @@
 <div class="form-grid">
 <label>身長（cm）<input id="heightInput" max="230" min="80" required="" step="0.1" type="number" value="175"/></label>
 <label>体重（kg）<input id="weightInput" max="250" min="10" required="" step="0.1" type="number" value="70"/></label>
-<label>性別（記録用・計算には使用しません）<select id="sexInput"><option value="unspecified">指定しない（補正なし）</option><option value="male">男性</option><option value="female">女性</option></select></label>
+<label>性別（身体部分質量の補正に使用）<select id="sexInput"><option value="unspecified">指定しない（補正なし）</option><option value="male">男性</option><option value="female">女性</option></select></label>
 <label>投球腕（軸足は投球腕側）<select id="handInput"><option value="right">右投げ（左足＝踏込足）</option><option value="left">左投げ（右足＝踏込足）</option></select></label>
 <label>映像の投球方向<select id="directionInput"><option value="right">画面右へ投球</option><option value="left">画面左へ投球</option></select></label>
 <label>関節の左右識別<select id="mirrorSidesInput"><option value="no">通常（推奨）</option><option value="yes">左右入替（鏡像や認識誤りの場合）</option></select></label>
@@ -152,12 +152,12 @@
 
 
 
-<p>再生コントロールの上にある「↓ 動画保存」から、解析区間（最大20秒）を表示中の動画・骨格・反力矢印のON/OFF状態で保存できます。端末内で再生しながら記録するため、保存に動画の再生時間程度かかります。「音声あり」にチェックすると元動画の音声も録画を試みます（初期状態は無音）。音声付き保存はブラウザのWeb Audio・MediaRecorder対応に依存します。保存形式はブラウザ対応によりMP4またはWebMです。iPhone Safariなどで保存先選択が必要な場合は、録画後の「保存した動画を開く」を利用してください。</p><p>動画画面の「動画 ON/OFF」で映像、「骨格 ON/OFF」で骨格線・関節点、「反力矢印 ON/OFF」で参考反力の模式矢印をそれぞれ切り替えられます。骨格表示は解析後に利用できます。鼻・目・耳・口の顔ランドマークと細い接続線を表示し、頭部の円形・楕円形の輪郭は描きません。信頼度が低い位置は省略します。非表示にしても解析済みデータは消えません。</p><p>使い方：スマートフォンのカメラで撮影した動画を読み込み、身長と体重、解析範囲を指定して「解析」を選択してください。すべての計算は端末内で実行します。</p><p>01 並進速度：左右肩・肘・手首、胸郭中央、骨盤中央、推定重心の2D位置を追跡します。重心はChandler身体部分質量と性別別de Leva質量比補正に基づく2D推定値です。全身の3D重心を実測するものではありません。</p><p>02 床反力（参考表示）：推定重心の2D加速度からFx=m ax、Fz=m(g+az)で全身反力を概算し、簡易的な接地・離地候補に基づき、支持点の相対配置と簡易重心の水平加速度で左右に分配します。各足の水平反力は重心向きが正です。各足の合力・鉛直・水平の6系列を表示します。これは物理法則の簡易デモであり、実際の脚別床反力の実測ではありません。接地候補は踏込離地→踏込接地→軸足離地→軸足再接地の順で推定し、十分な証拠がなければ検出しません。動画上の矢印は各足から推定重心へ向けた模式表示であり、実際の反力ベクトル方向ではありません。1 BWで推定重心に達する縮尺です。</p><p>03 力学・距離：ストライドは両足首の投球方向の画面内距離、投球腕の手首移動量は解析開始位置からの水平変位の絶対値です。エネルギーは重心速度の仮の並進エネルギーです。ボールリリース時刻・距離は推定しません。</p><p>距離は身長と初期画像上の人物の高さからの概算です。前後への移動やカメラの角度が変わると計測誤差が発生します。実測の床反力ではなく、足部移動による接地候補と簡易重心・支持点の配置に基づく参考情報です。医療判断や競技評価の断定に使用しないでください。</p><p>MediaPipeとWASM／モデルはこのサイトの /vendor/ フォルダから提供され、端末で実行されます。通常の動画データはサーバーへアップロードしません。初回にサイトを読み込んだ後、Service Workerで資産をキャッシュできます。</p><p class="license-note">このデモの商用利用は有償です。業務利用、有料指導などには提供者との事前ライセンス契約が必要です。使用するMediaPipe等の第三者ソフトウェアのライセンスは各提供者の条件に従います。</p><p class="subtle" id="statusDetails">モデル未読み込み</p>
+<p>再生コントロールの上にある「↓ 動画保存」から、解析区間（最大20秒）を表示中の動画・骨格・反力矢印のON/OFF状態で保存できます。端末内で再生しながら記録するため、保存に動画の再生時間程度かかります。「音声あり」にチェックすると元動画の音声も録画を試みます（初期状態は無音）。音声付き保存はブラウザのWeb Audio・MediaRecorder対応に依存します。保存形式はブラウザ対応によりMP4またはWebMです。iPhone Safariなどで保存先選択が必要な場合は、録画後の「保存した動画を開く」を利用してください。</p><p>動画画面の「動画 ON/OFF」で映像、「骨格 ON/OFF」で骨格線・関節点、「反力矢印 ON/OFF」で参考反力の模式矢印をそれぞれ切り替えられます。骨格表示は解析後に利用できます。鼻・目・耳・口の顔ランドマークと細い接続線を表示し、頭部の円形・楕円形の輪郭は描きません。信頼度が低い位置は省略します。非表示にしても解析済みデータは消えません。</p><p>使い方：スマートフォンのカメラで撮影した動画を読み込み、身長と体重、解析範囲を指定して「解析」を選択してください。すべての計算は端末内で実行します。</p><p>01 並進速度：左右肩・肘・手首、胸郭中央、骨盤中央、推定重心の2D位置を追跡します。重心はChandler身体部分質量と性別別de Leva質量比補正に基づく2D推定値です。全身の3D重心を実測するものではありません。</p><p>02 床反力（参考表示）：推定重心の2D加速度からFx=m ax、Fz=m(g+az)で全身反力を概算し、簡易的な接地・離地候補に基づき、支持点の相対配置と簡易重心の水平加速度で左右に分配します。各足の水平反力は重心向きが正です。各足の合力・鉛直・水平の6系列を表示します。これは物理法則の簡易デモであり、実際の脚別床反力の実測ではありません。接地候補は踏込離地→踏込接地→軸足離地→軸足再接地の順で推定し、十分な証拠がなければ検出しません。動画上の矢印は各足から推定重心へ向けた模式表示であり、実際の反力ベクトル方向ではありません。1 BWで推定重心に達する縮尺です。</p><p>03 力学・距離：推定ストライドは足首の画面内水平距離です。推定リリースポイントは、軸足足首の後方基準位置から投球側の指先（欠測時は手首）までの前方距離（m）です。グラフの◆は投球期に最初に現れる有意な伸展ピークであり、実際のボール離手位置を直接計測するものではありません。重心・骨盤・両肩・両肘・両手首・両手先の並進エネルギーは推定質量比と速度から求めた参考値です。</p><p>距離は身長と初期画像上の人物の高さからの概算です。前後への移動やカメラの角度が変わると計測誤差が発生します。実測の床反力ではなく、足部移動による接地候補と簡易重心・支持点の配置に基づく参考情報です。医療判断や競技評価の断定に使用しないでください。</p><p>MediaPipeとWASM／モデルはこのサイトの /vendor/ フォルダから提供され、端末で実行されます。通常の動画データはサーバーへアップロードしません。初回にサイトを読み込んだ後、Service Workerで資産をキャッシュできます。</p><p class="license-note">このデモの商用利用は有償です。業務利用、有料指導などには提供者との事前ライセンス契約が必要です。使用するMediaPipe等の第三者ソフトウェアのライセンスは各提供者の条件に従います。</p><p class="subtle" id="statusDetails">モデル未読み込み</p>
 <div class="dialog-actions"><button class="primary" value="close">閉じる</button></div>
 </form>
 </dialog>
 <div aria-live="polite" class="actionbar transient" id="actionbar" role="status"><span id="message">画面起動中…</span><button hidden="" id="runAnalysis">解析開始</button><button hidden="" id="cancelAnalysis">中止</button><button aria-label="通知を閉じる" id="dismissMessage" title="通知を閉じる" type="button">✕</button></div>
 <input accept="video/*,.mp4,.mov,.m4v,.webm" aria-label="動画ファイルを選択" class="native-file-input" id="videoFile" type="file"/>
-<script defer="" src="./js/public-v1.6.8.js?rev=20261020smoothchoice168"></script>
+<script defer="" src="./js/public-v1.6.8.js?rev=20261020integrated168"></script>
 </body>
 </html>

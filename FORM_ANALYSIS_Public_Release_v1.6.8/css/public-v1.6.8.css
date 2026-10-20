@@ -951,3 +951,75 @@ html.viewer-fullscreen-active .workspace {overflow:visible !important;}
  .results .metrics .measure.dual strong{font-size:1.05rem;}
  .results .chart-card{min-height:390px;grid-template-rows:auto auto minmax(320px,1fr) auto auto;}
 }
+
+
+/* v1.6.8 layout harmonization: page 01 is the reference for both cards
+   and plot dimensions on pages 02 and 03.  Keep card rows identical even
+   when a page has only six visible cards (unused cells remain blank). */
+@media (min-width:768px) and (min-height:640px) {
+  .results[data-page="speed"],
+  .results[data-page="forces"],
+  .results[data-page="dynamics"] {
+    grid-template-rows:auto minmax(0,1fr) minmax(0,1.6fr) 18px;
+  }
+  .results .metrics[data-page="speed"],
+  .results .metrics[data-page="forces"],
+  .results .metrics[data-page="dynamics"] {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-rows:repeat(4,minmax(0,1fr));
+    grid-auto-rows:minmax(0,1fr);
+    height:100%;
+    min-height:0;
+    gap:5px;
+    align-content:stretch;
+  }
+  .results .metrics .metric {min-height:0;height:100%;}
+  .results .chart-card {min-height:0;}
+  .results .page-help {
+    height:18px;min-height:18px;max-height:18px;
+    overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+  }
+}
+/* All three graphs use the same minimum plotting height on mobile;
+   the workspace scrolls rather than shrinking an SVG into unreadability. */
+@media (max-width:767px), (max-height:639px) {
+  .results[data-page="speed"],
+  .results[data-page="forces"],
+  .results[data-page="dynamics"] {
+    display:flex;flex-direction:column;height:auto;min-height:0;
+  }
+  .results .metrics[data-page="speed"],
+  .results .metrics[data-page="forces"],
+  .results .metrics[data-page="dynamics"] {
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-rows:none;grid-auto-rows:48px;
+    height:auto;min-height:0;gap:5px;
+  }
+  .results .metrics .metric{height:48px;min-height:48px;max-height:48px;}
+  .results .chart-card {
+    flex:0 0 auto;height:auto;min-height:390px;
+    grid-template-rows:auto auto minmax(320px,1fr) auto auto;
+  }
+  .results #plot{height:320px;min-height:320px;}
+  .results .page-help{height:auto;max-height:none;white-space:normal;}
+}
+
+/* v1.6.8: selected tabs use their series color; this includes fingertip L/R.
+   The default color always exists; no undefined custom properties / white fill. */
+#tabs .series-tab[data-series="true"].selected,
+#tabs .series-tab[data-series="true"][aria-pressed="true"] {
+  color:#fff;
+  background-color:var(--series-color,#196d83);
+  border:1px solid var(--series-color,#196d83);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);
+}
+#tabs .series-tab[data-series="true"].selected .series-tab-name,
+#tabs .series-tab[data-series="true"].selected .series-tab-value {
+  color:#fff;
+  opacity:1;
+}
+#tabs .series-tab[data-series="true"][aria-pressed="false"] {
+  background:#fff;
+  border:1px solid #dce7e5;
+  color:#475e69;
+}

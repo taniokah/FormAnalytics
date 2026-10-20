@@ -83,7 +83,7 @@ The original FORM ANALYSIS components are distributed under the FORM ANALYSIS Re
 ### v1.6.8 / 更新事項
 - 身体部分質量による2D重心推定（Chandler質量回帰＋de Leva性別比率補正）。実測・3D重心ではありません。
 - 各脚の合力は同一フレームの水平成分と鉛直成分の二乗和平方根で算出します。
-- 速度カードは重心、胸郭、骨盤、両肩、両肘、両手首の6枚。両手先速度カードは削除しました。
+- 速度カードは重心、頭部中心、胸部中心、骨盤中心、両肩、両肘、両手首、両手先の8枚。両手先速度は左右の各フレームをグラフと共有し、カードには左右の最大値を表示します。
 
 
 ### 解析精度（時間平滑化）
@@ -91,3 +91,6 @@ The original FORM ANALYSIS components are distributed under the FORM ANALYSIS Re
 
 
 Public UI update: eight speed indicators (including head center and fingertips), six unchanged ground reaction force indicators, and eight dynamics/distance indicators. Release point is a throwing-wrist speed-peak 2D proxy, not observed ball release. Segment energies use assumed mass fractions and should not be treated as validated measurements.
+
+
+**推定リリースポイント / Estimated release point (public v1.6.8):** グラフは軸足足首の後方基準位置から投球側指先（欠測時は手首）までの前方距離（m）の時間変化を示し、◆は最初の有意な伸展ピークを示します。/ The graph shows forward fingertip distance from a rear drive-ankle reference (m), with ◆ marking the first prominent extension peak. This is not a direct measurement of ball release.

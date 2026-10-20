@@ -1,5 +1,5 @@
 /* Public Preview PWA, local same-origin assets only. */
-const CACHE='form-analysis-public-preview-v1.6.8-smoothing-config-20261020';
+const CACHE='form-analysis-public-preview-v1.6.8-integrated-20261020';
 const FILES=['./','./index.html','./js/public-v1.6.8.js','./css/public-v1.6.8.css','./manifest.webmanifest','./icons/icon.svg',
  './vendor/vision_bundle.mjs','./vendor/wasm/vision_wasm_internal.js','./vendor/wasm/vision_wasm_internal.wasm',
  './vendor/wasm/vision_wasm_nosimd_internal.js','./vendor/wasm/vision_wasm_nosimd_internal.wasm',

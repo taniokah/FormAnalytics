@@ -1,4 +1,4 @@
-/* FORM ANALYSIS Public Preview v1.6.7
+/* FORM ANALYSIS Public Preview v1.6.8
  * Single-pass 2D kinematics. Foot force allocation uses the filed/
  * patent-pending support-point + approximate-center + acceleration model.
  * Simple sequential 2D foot motion and relative foot-height heuristics estimate contact candidates.
@@ -10,8 +10,8 @@
 const $=id=>document.getElementById(id);
 const video=$('video'), canvas=$('overlay'),fileInput=$('videoFile');
 const G=9.80665, KEY_MIN=.30, MAX_ANALYSIS_SECONDS=20;
-const COLORS={leadResultant:'#f39b33',driveResultant:'#499ff4',leadVertical:'#df851b',driveVertical:'#317fd4',leadHorizontal:'#b76b17',driveHorizontal:'#225faf',comSpeed:'#078d79',pelvisSpeed:'#9d59cb',thoraxSpeed:'#3286d3',shoulderL:'#ac62d2',shoulderR:'#ea9550',elbowL:'#2377b8',elbowR:'#d3637a',wristL:'#00a09a',wristR:'#d28d39',headSpeed:'#369bad',releaseX:'#078d79',releaseY:'#3388cb',comEnergy:'#008f7a',pelvisEnergy:'#9d59cb',shoulderEnergyL:'#b060c9',shoulderEnergyR:'#eb8c4c',elbowEnergyL:'#ad6ada',elbowEnergyR:'#d36a80',wristEnergyL:'#21a4aa',wristEnergyR:'#d6a455',tipEnergyL:'#15b3a4',tipEnergyR:'#e59553',forceTotal:'#2a7398',forceVertical:'#ed9636',forceHorizontal:'#9c60d5',stride:'#0b9299',wristTravel:'#267aa2',energy:'#8f68ce'};
-const LABELS={leadResultant:'踏込足 床反力（合力）',driveResultant:'軸足 床反力（合力）',leadVertical:'踏込足 鉛直（参考配分）',driveVertical:'軸足 鉛直（参考配分）',leadHorizontal:'踏込足 水平（重心向き＋・参考）',driveHorizontal:'軸足 水平（重心向き＋・参考）',comSpeed:'重心速度',headSpeed:'頭部中心速度',pelvisSpeed:'骨盤速度',thoraxSpeed:'胸郭中心速度',shoulderL:'左肩',shoulderR:'右肩',elbowL:'左肘',elbowR:'右肘',wristL:'左手首',wristR:'右手首',forceTotal:'全身参考合力',forceVertical:'参考鉛直反力',forceHorizontal:'参考水平反力',stride:'足首間前後距離',wristTravel:'投球手首の水平移動量',energy:'重心の参考エネルギー',comEnergy:'重心並進エネルギー',pelvisEnergy:'骨盤並進エネルギー',shoulderEnergyL:'左肩並進エネルギー',shoulderEnergyR:'右肩並進エネルギー',elbowEnergyL:'左肘並進エネルギー',elbowEnergyR:'右肘並進エネルギー',wristEnergyL:'左手首並進エネルギー',wristEnergyR:'右手首並進エネルギー',tipEnergyL:'左手先並進エネルギー',tipEnergyR:'右手先並進エネルギー',releaseX:'リリース候補水平位置',releaseY:'リリース候補鉛直位置'};
+const COLORS={leadResultant:'#f39b33',driveResultant:'#499ff4',leadVertical:'#df851b',driveVertical:'#317fd4',leadHorizontal:'#b76b17',driveHorizontal:'#225faf',comSpeed:'#078d79',pelvisSpeed:'#9d59cb',thoraxSpeed:'#3286d3',shoulderL:'#ac62d2',shoulderR:'#ea9550',elbowL:'#2377b8',elbowR:'#d3637a',wristL:'#00a09a',wristR:'#d28d39',headSpeed:'#369bad',handTipL:'#126f8b',handTipR:'#c34b68',releasePoint:'#168db1',releaseX:'#078d79',releaseY:'#3388cb',comEnergy:'#008f7a',pelvisEnergy:'#9d59cb',shoulderEnergyL:'#b060c9',shoulderEnergyR:'#eb8c4c',elbowEnergyL:'#ad6ada',elbowEnergyR:'#d36a80',wristEnergyL:'#21a4aa',wristEnergyR:'#d6a455',tipEnergyL:'#15b3a4',tipEnergyR:'#e59553',forceTotal:'#2a7398',forceVertical:'#ed9636',forceHorizontal:'#9c60d5',stride:'#0b9299',wristTravel:'#267aa2',energy:'#8f68ce'};
+const LABELS={leadResultant:'踏込足 床反力（合力）',driveResultant:'軸足 床反力（合力）',leadVertical:'踏込足 鉛直（参考配分）',driveVertical:'軸足 鉛直（参考配分）',leadHorizontal:'踏込足 水平（重心向き＋・参考）',driveHorizontal:'軸足 水平（重心向き＋・参考）',comSpeed:'重心速度',headSpeed:'頭部中心速度',pelvisSpeed:'骨盤速度',thoraxSpeed:'胸郭中心速度',shoulderL:'左肩',shoulderR:'右肩',elbowL:'左肘',elbowR:'右肘',wristL:'左手首',wristR:'右手首',forceTotal:'全身参考合力',forceVertical:'参考鉛直反力',forceHorizontal:'参考水平反力',stride:'足首間前後距離',wristTravel:'投球手首の水平移動量',energy:'重心の参考エネルギー',comEnergy:'重心並進エネルギー',pelvisEnergy:'骨盤並進エネルギー',shoulderEnergyL:'左肩並進エネルギー',shoulderEnergyR:'右肩並進エネルギー',elbowEnergyL:'左肘並進エネルギー',elbowEnergyR:'右肘並進エネルギー',wristEnergyL:'左手首並進エネルギー',wristEnergyR:'右手首並進エネルギー',tipEnergyL:'左手先並進エネルギー',tipEnergyR:'右手先並進エネルギー',handTipL:'左手先',handTipR:'右手先',releasePoint:'推定リリースポイント（軸足→投球指先の前方距離）',releaseX:'リリース候補水平位置',releaseY:'リリース候補鉛直位置'};
 const PAGE={speed:{cards:[
  {id:'com',name:'重心速度',keys:['comSpeed'],unit:'m/s',icon:'◉'},
  {id:'head',name:'頭部中心速度',keys:['headSpeed'],unit:'m/s',icon:'◌'},
@@ -30,7 +30,7 @@ const PAGE={speed:{cards:[
  {id:'lead-horizontal',name:'踏込足 水平反力',tab:'踏込 水平',keys:['leadHorizontal'],unit:'N',icon:'↔'}
  ]},dynamics:{cards:[
  {id:'stride',name:'推定ストライド',keys:['stride'],unit:'m',icon:'↔'},
- {id:'release',name:'推定リリースポイント',keys:['releaseX','releaseY'],keyLabels:['X','Y'],unit:'m',icon:'⊙'},
+ {id:'release',name:'推定リリースポイント',keys:['releasePoint'],unit:'m',icon:'◆'},
  {id:'energy-com',name:'重心並進エネルギー',keys:['comEnergy'],unit:'J',icon:'◈'},
  {id:'energy-pelvis',name:'骨盤並進エネルギー',keys:['pelvisEnergy'],unit:'J',icon:'◈'},
  {id:'energy-shoulder',name:'両肩並進エネルギー',keys:['shoulderEnergyL','shoulderEnergyR'],unit:'J',icon:'◈'},
@@ -368,6 +368,57 @@ function smoothPositionTrack(track,times,windowSize=3){
     return count>0?{x:sx/count,y:sy/count}:{x:point.x,y:point.y};
   });
 }
+// A release distance proxy using the same reference and peak-search convention
+// as the research version. It is NOT direct detection of ball separation.
+function quantileSorted(values,q){
+  if(!values.length)return null;
+  const v=values.slice().sort((a,b)=>a-b),x=(v.length-1)*q,i=Math.floor(x),f=x-i;
+  return v[i]*(1-f)+v[Math.min(i+1,v.length-1)]*f;
+}
+function scalarMedian(values){return quantileSorted(values.filter(Number.isFinite),.5);}
+function smoothReleaseSeries(values,radius=2){
+  return values.map((v,i)=>{
+    if(!Number.isFinite(v))return null;
+    const nearby=values.slice(Math.max(0,i-radius),Math.min(values.length,i+radius+1)).filter(Number.isFinite);
+    return nearby.length>=2?nearby.reduce((a,b)=>a+b,0)/nearby.length:v;
+  });
+}
+function firstMeaningfulReleasePeak(distances,times,lo=0,hi=distances.length){
+  lo=Math.max(0,lo|0);hi=Math.min(distances.length,hi|0);
+  if(hi-lo<5)return -1;
+  const series=smoothReleaseSeries(distances,2);
+  const valid=series.slice(lo,hi).filter(Number.isFinite);
+  if(valid.length<5)return -1;
+  const top=Math.max(...valid),base=scalarMedian(series.slice(lo,Math.min(hi,lo+6)))??0;
+  const gate=Math.max(.35,base+.20,top*.32),rise=Math.max(.17,top*.09),fall=Math.max(.065,top*.035);
+  const nearby=(i,seconds,before)=>{
+    const xs=[];
+    for(let j=before?i-1:i+1;
+        j>=lo&&j<hi&&(before?times[i]-times[j]<=seconds:times[j]-times[i]<=seconds);
+        j+=before?-1:1){
+      if(Number.isFinite(series[j]))xs.push(series[j]);
+    }
+    return xs;
+  };
+  // The first valid local peak takes priority over a larger follow-through peak.
+  for(let i=lo+2;i<hi-2;i++){
+    const v=series[i],a=series[i-1],b=series[i+1];
+    if(!Number.isFinite(v)||!Number.isFinite(a)||!Number.isFinite(b)||v<gate)continue;
+    if(!(v>=a&&v>b))continue;
+    const earlier=nearby(i,.42,true),later=nearby(i,.28,false);
+    if(earlier.length&&later.length&&v-Math.min(...earlier)>=rise&&v-Math.min(...later)>=fall)return i;
+  }
+  // If the clip ends on a well-supported plateau, accept its first valid start.
+  for(let i=lo+2;i<hi-3;i++){
+    const v=series[i];if(!Number.isFinite(v)||v<gate)continue;
+    const earlier=nearby(i,.42,true),later=nearby(i,.16,false);
+    if(earlier.length<2||later.length<2)continue;
+    if(v-Math.min(...earlier)<rise)continue;
+    if(Math.max(...later.map(x=>Math.abs(x-v)))<=Math.max(.035,top*.02))return i;
+  }
+  return -1;
+}
+
 function computePublicMetrics(frames,params,width,heightPx){
   const smoothingFrames=Math.max(1,Math.min(5,Math.round(Number(params.smoothing)||3)));
   const times=frames.map(f=>f.t),flipX=params.direction==='left'?-1:1;
@@ -463,23 +514,53 @@ function computePublicMetrics(frames,params,width,heightPx){
     }
     return obj;
   });
-  // Release proxy: throwing-wrist maximum-speed frame, NOT confirmed ball release.
-  const throwingKey=params.hand==='left'?'wristL':'wristR';
-  let releaseIndex=-1,highest=-Infinity;
-  for(let i=0;i<frames.length;i++){
-    const v=speeds[throwingKey][i];
-    if(Number.isFinite(v)&&points[throwingKey][i]&&v>highest){highest=v;releaseIndex=i;}
-  }
+  // Research-version release point convention: forward distance from the
+  // backward-most reliable drive-ankle position to the throwing index fingertip.
+  // The wrist is used only where the index landmark is missing. The observed
+  // distance is graphed at EVERY frame; the first salient extension peak marks
+  // the estimated release event. This proxy is not verified ball separation.
+  const leadSide=params.hand==='right'?'left':'right';
+  const driveSide=leadSide==='left'?'right':'left';
+  const driveLandmark=flipSide(driveSide==='left'?27:28);
+  const throwingTip=params.hand==='left'?19:20;
+  const throwingWrist=params.hand==='left'?15:16;
+  const earlyLimit=Math.max(5,Math.min(frames.length,Math.round(frames.length*.6)));
+  const anchorXs=frames.slice(0,earlyLimit).map(f=>lookup(f.pose,driveLandmark)?.x).filter(Number.isFinite);
+  const driveAnchorX=quantileSorted(anchorXs,params.direction==='left'?.80:.20);
+  const tipXs=frames.map(f=>lookup(f.pose,throwingTip)?.x??null);
+  const wristXs=frames.map(f=>lookup(f.pose,throwingWrist)?.x??null);
+  const extensionX=frames.map((_,i)=>{
+    const x=Number.isFinite(tipXs[i])?tipXs[i]:wristXs[i];
+    return Number.isFinite(x)&&Number.isFinite(driveAnchorX)&&Number.isFinite(scale)?
+      (x-driveAnchorX)*flipX*width*scale:null;
+  });
+  // Use the same chronological, first-prominent-peak search as the alpha build.
+  const lo=Math.min(frames.length-1,Math.floor(frames.length*.12));
+  const hi=Math.max(lo+1,Math.min(frames.length,Math.ceil(frames.length*.98)));
+  const releaseIndex=firstMeaningfulReleasePeak(extensionX,times,lo,hi);
+  const releaseEvent=releaseIndex>=0?{
+    time:times[releaseIndex],frame:releaseIndex,
+    value:extensionX[releaseIndex],
+    method:'first-prominent-fingertip-forward-extension-peak',
+    point:Number.isFinite(tipXs[releaseIndex])?'index-landmark':'wrist-fallback',
+    reference:'drive-ankle-backward-quantile',
+    confirmed:false
+  }:null;
   for(let i=0;i<mapped.length;i++){
-    const pt=releaseIndex>=0?points[throwingKey][releaseIndex]:null;
-    mapped[i].releaseX=pt&&scale!=null?pt.x*width*scale:null;
-    mapped[i].releaseY=pt&&scale!=null?(1-pt.y)*heightPx*scale:null;
+    mapped[i].releasePoint=extensionX[i];
   }
-  const summary={};for(const k of Object.keys(LABELS)){
+  // Include every metric key shown by a card, even when it has no chart-label alias.
+  // This prevents summary cards (e.g., left/right fingertips) from showing a dash
+  // while their time-series graph contains valid observations.
+  const summaryKeys=new Set([...Object.keys(LABELS),...Object.values(PAGE).flatMap(page=>page.cards.flatMap(card=>card.keys))]);
+  const summary={};for(const k of summaryKeys){
     const vals=mapped.map(s=>s[k]).filter(Number.isFinite);
     summary[k]=vals.length?(k==='leadHorizontal'||k==='driveHorizontal'||k==='forceHorizontal'?vals.reduce((a,b)=>Math.abs(b)>Math.abs(a)?b:a):Math.max(...vals.map(Math.abs))):null;
   }
-  return {samples:mapped,duration:Math.max(0,times.at(-1)??0),summary,scale:measured,quality:{detected:frames.filter(f=>Array.isArray(f.pose)).length,all:frames.length},events:contact.events,contactAssumption:contact.assumption,model:'single-pass-filed-grf-support-point-plus-relative-foot-height'};
+  // The summary is the distance AT the estimated release event, not the
+  // potentially larger late follow-through distance.
+  summary.releasePoint=releaseEvent?releaseEvent.value:null;
+  return {samples:mapped,duration:Math.max(0,times.at(-1)??0),summary,scale:measured,quality:{detected:frames.filter(f=>Array.isArray(f.pose)).length,all:frames.length},events:contact.events,releaseEvent,contactAssumption:contact.assumption,model:'single-pass-filed-grf-support-point-plus-relative-foot-height'};
 }
 
 // ---- Same-origin MediaPipe PoseLandmarker with a reusable instance ----
@@ -610,7 +691,7 @@ function toggleCard(id){const current=state.selected[state.page];if(current.has(
   if(selectedUnit&&selectedUnit!==def.unit){current.clear();notify('グラフの単位を切り替えました');}current.add(id);
 }buildCards();render();}
 function seriesKeys(){return chartDefs().filter(c=>state.selected[state.page].has(c.id)).flatMap(c=>c.keys);}
-function styleSeries(element,c){const primary=COLORS[c.keys[0]];element.dataset.series='true';element.style.setProperty('--series-color',primary);element.style.setProperty('--series-secondary',COLORS[c.keys.at(-1)]);element.style.setProperty('--series-ink','#fff');}
+function styleSeries(element,c){const primary=COLORS[c.keys[0]]||'#196d83';element.dataset.series='true';element.style.setProperty('--series-color',primary);element.style.setProperty('--series-secondary',COLORS[c.keys.at(-1)]||primary);element.style.setProperty('--series-ink','#fff');}
 function buildCards(){
   $('metrics').replaceChildren();$('tabs').replaceChildren();$('metrics').dataset.page=state.page;document.querySelector('.results').dataset.page=state.page;
   document.querySelectorAll('#pageSwitch button').forEach(b=>{const active=b.dataset.page===state.page;b.classList.toggle('selected',active);b.setAttribute('aria-selected',String(active));});
@@ -637,7 +718,8 @@ function buildCards(){
     tab.append(tabLabel,tabValue);
     tab.onclick=()=>toggleCard(c.id);$('tabs').append(tab);
   }
-  $('pageHelp').textContent=state.page==='forces'?'【参考推定】足部動作と左右足の高さ差から接地候補を推測し、支持点・推定重心・加速度から床反力を配分。脚別水平値は重心向きを正とする参考表示で、各足の実際の作用方向は独立には推定していません。▲離地、▼接地（候補）。':state.page==='dynamics'?'リリースポイントは投球手首の最高速度フレーム位置の2D参考値（Xは画面左端から、Yは画面下端から）で、実際のボール離手点ではありません。部位エネルギーは概算質量比と速度から計算した参考値です。':'速度は画像内2D位置の変化から求めています。重心はChandler身体部分質量モデルによる2D参考推定です。';
+  $('pageHelp').textContent=state.page==='forces'?'【参考推定】足部動作と左右足の高さ差から接地候補を推測し、支持点・推定重心・加速度から床反力を配分。脚別水平値は重心向きを正とする参考表示で、各足の実際の作用方向は独立には推定していません。▲離地、▼接地（候補）。':state.page==='dynamics'?'推定リリースポイントは、軸足足首の後方基準位置から投球側人差し指先（欠測時は手首）までの前方距離です。グラフの◆は投球期に最初に現れる有意な伸展ピークの推定時刻です。実際のボール離手点ではありません。部位エネルギーは概算質量比と速度による参考値です。':'速度は画像内2D位置の変化から求めています。重心はChandler身体部分質量モデルによる2D参考推定です。';
+  $('pageHelp').title=$('pageHelp').textContent;
   $('forceLayerToggle').closest('label').hidden=state.page==='forces';
 }
 const svgNode=(name,props={},str)=>{const n=document.createElementNS('http://www.w3.org/2000/svg',name);Object.entries(props).forEach(([k,v])=>n.setAttribute(k,v));if(str!==undefined)n.textContent=str;return n;};
@@ -688,6 +770,18 @@ function chart(){
     const mark=svgNode('text',{x,y:bounds.y1+11,'text-anchor':'middle','font-size':12,'font-weight':800,fill:color},e.type==='takeoff'?'▲':'▼');
     mark.append(svgNode('title',{},`${e.foot==='lead'?'踏込足':'軸足'}${e.type==='takeoff'?'離地':'接地'} 候補 ${e.t.toFixed(2)}秒`));
     svg.append(mark);
+  }
+  if(state.page==='dynamics'&&keys.includes('releasePoint')&&Number.isFinite(state.analysis?.releaseEvent?.time)){
+    const ev=state.analysis.releaseEvent;
+    if(ev.time>=rows[0].t&&ev.time<=rows.at(-1).t){
+      const x=fx(ev.time),color=COLORS.releasePoint;
+      svg.append(svgNode('line',{x1:x,y1:bounds.y0,x2:x,y2:bounds.y1,stroke:color,'stroke-width':1.6,opacity:.9}));
+      const marker=svgNode('text',{x,y:bounds.y1+12,'text-anchor':'middle','font-size':13,'font-weight':850,fill:color},'◆');
+      marker.append(svgNode('title',{},`推定リリース ${ev.time.toFixed(2)}秒／軸足→指先 ${Number.isFinite(ev.value)?ev.value.toFixed(2)+'m':'不明'}`));
+      svg.append(marker);
+      const item=document.createElement('span'),dot=document.createElement('i');
+      dot.textContent='◆';dot.style.color=color;item.append(dot,document.createTextNode('リリース（推定）'));legend.append(item);
+    }
   }
   if(evts.length){
     for(const [color,name] of [['#f39b33','踏込足'],['#499ff4','軸足']]){
@@ -1192,7 +1286,7 @@ async function exportVideo(){
     if(canceled){$('recordStatus').textContent='保存を中止しました';return;}
     if(!blob.size)throw Error('録画ファイルが空でした');
     const mp4=/mp4/i.test(blob.type),ext=mp4?'mp4':'webm';
-    const name=`FORM_ANALYSIS_Public_v1.6.7_${Date.now()}.${ext}`;
+    const name=`FORM_ANALYSIS_Public_v1.6.8_${Date.now()}.${ext}`;
     lastVideoExportURL=URL.createObjectURL(blob);
     anchor.href=lastVideoExportURL;anchor.download=name;anchor.hidden=false;
     $('recordStatus').textContent=`${ext.toUpperCase()}・${(blob.size/1048576).toFixed(1)} MB・${audioLabel}`;
@@ -1239,17 +1333,17 @@ async function snapshot(){
     out.toBlob(b=>{
       if(!b){notify('画像の作成に失敗しました');return;}
       const u=URL.createObjectURL(b),a=document.createElement('a');
-      a.href=u;a.download='FORM_ANALYSIS_Public_v1.6.7_frame.png';a.click();
+      a.href=u;a.download='FORM_ANALYSIS_Public_v1.6.8_frame.png';a.click();
       setTimeout(()=>URL.revokeObjectURL(u),800);
     },'image/png');
   }catch(e){notify('PNGを保存できません：'+e.message);}
 }
 function exportCsv(){if(!stateReady()){notify('先に解析を実行してください');return;}
-  const keys=['t','contactPhase','contactSource','footHeightDiffM','leadContact','driveContact','comSpeed','headSpeed','pelvisSpeed','thoraxSpeed','shoulderL','shoulderR','elbowL','elbowR','wristL','wristR','handTipL','handTipR','forceTotal','forceVertical','forceHorizontal','leadResultant','driveResultant','leadVertical','driveVertical','leadHorizontal','driveHorizontal','leadHorizontalWorld','driveHorizontalWorld','stride','wristTravel','energy','releaseX','releaseY','comEnergy','pelvisEnergy','shoulderEnergyL','shoulderEnergyR','elbowEnergyL','elbowEnergyR','wristEnergyL','wristEnergyR','tipEnergyL','tipEnergyR','shareLead'];
-  const lines=['# FORM ANALYSIS Public Preview v1.6.7','# Chandler segment-mass based 2D projected CoM (sex-stratified de Leva correction), research estimate; NOT measured 3D CoM','# Position tracks: centered moving mean of current +/-2 frames (up to 5, within 0.16 seconds, no missing-center imputation); derivatives computed afterward','# Support-point load partition uses projected Chandler CoM and its acceleration; NOT measured foot GRF',`# height_cm=${state.config.height} weight_kg=${state.config.weight} sex(anthropometric)=${state.config.sex}`,'# Contact candidates: sequential foot motion + relative bilateral toe/heel/ankle height difference, 3 stable observations; 2D unvalidated heuristic', '# footHeightDiffM: positive means lead foot appears higher than drive; camera perspective, steps and mounds can misclassify support', '# leadHorizontal/driveHorizontal: inward-positive reference magnitudes (foot -> CoM); each resultant equals hypot(vertical,horizontal) within the SAME frame', '# *HorizontalWorld: signed pitch-direction allocation, sums to forceHorizontal (not the inward-display convention)',`# contact_assumption=${state.analysis.contactAssumption}`,...state.analysis.events.map(e=>`# event=${e.foot}_${e.type},time_s=${e.t.toFixed(3)},quality=candidate`),keys.join(',')];
+  const keys=['t','contactPhase','contactSource','footHeightDiffM','leadContact','driveContact','comSpeed','headSpeed','pelvisSpeed','thoraxSpeed','shoulderL','shoulderR','elbowL','elbowR','wristL','wristR','handTipL','handTipR','forceTotal','forceVertical','forceHorizontal','leadResultant','driveResultant','leadVertical','driveVertical','leadHorizontal','driveHorizontal','leadHorizontalWorld','driveHorizontalWorld','stride','wristTravel','energy','releasePoint','comEnergy','pelvisEnergy','shoulderEnergyL','shoulderEnergyR','elbowEnergyL','elbowEnergyR','wristEnergyL','wristEnergyR','tipEnergyL','tipEnergyR','shareLead'];
+  const lines=['# FORM ANALYSIS Public Preview v1.6.8','# Chandler segment-mass based 2D projected CoM (sex-stratified de Leva correction), research estimate; NOT measured 3D CoM','# Position tracks: centered moving mean of current +/-2 frames (up to 5, within 0.16 seconds, no missing-center imputation); derivatives computed afterward','# Support-point load partition uses projected Chandler CoM and its acceleration; NOT measured foot GRF',`# height_cm=${state.config.height} weight_kg=${state.config.weight} sex(anthropometric)=${state.config.sex}`,'# Contact candidates: sequential foot motion + relative bilateral toe/heel/ankle height difference, 3 stable observations; 2D unvalidated heuristic', '# footHeightDiffM: positive means lead foot appears higher than drive; camera perspective, steps and mounds can misclassify support', '# leadHorizontal/driveHorizontal: inward-positive reference magnitudes (foot -> CoM); each resultant equals hypot(vertical,horizontal) within the SAME frame', '# *HorizontalWorld: signed pitch-direction allocation, sums to forceHorizontal (not the inward-display convention)', '# releasePoint: estimated forward distance (m) from drive-ankle backward quantile to throwing index fingertip (wrist fallback); diamond = first prominent extension peak, NOT measured ball release',`# contact_assumption=${state.analysis.contactAssumption}`,...state.analysis.events.map(e=>`# event=${e.foot}_${e.type},time_s=${e.t.toFixed(3)},quality=candidate`),keys.join(',')];
   for(const row of state.analysis.samples)lines.push(keys.map(k=>
     Number.isFinite(row[k])?row[k].toFixed(5):typeof row[k]==='string'?row[k]:'').join(','));
-  const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='FORM_ANALYSIS_PUBLIC_v1.6.7.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notify('CSVを保存しました');
+  const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='FORM_ANALYSIS_PUBLIC_v1.6.8.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notify('CSVを保存しました');
 }
 async function cacheOffline(){const status=$('runtimeStatus');if(!('serviceWorker'in navigator)||!/^https?:$/.test(location.protocol)){status.textContent='HTTP(S)経由で起動してください';return;}
   try{const reg=await navigator.serviceWorker.register('./service-worker.js');await navigator.serviceWorker.ready;const active=reg.active||navigator.serviceWorker.controller;

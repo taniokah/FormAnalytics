@@ -153,3 +153,10 @@ GitHub Pages の公開設定、ファイル配置、ブラウザのキャッシ�
 - 身体部分質量による2D重心推定（Chandler質量回帰＋de Leva性別比率補正）。実測・3D重心ではありません。
 - 各脚の合力は同一フレームの水平成分と鉛直成分の二乗和平方根で算出します。
 - 速度カードは重心、胸郭、骨盤、両肩、両肘、両手首の6枚。両手先速度カードは削除しました。
+
+
+### 解析精度（時間平滑化）
+設定画面で1〜5フレームを選択できます（初期値3）。小さい値は短時間のピークを保持しやすい一方でノイズが増えることがあり、大きい値はグラフが安定する一方でピークが小さくなることがあります。精度向上を保証する設定ではありません。
+
+
+Public UI update: eight speed indicators (including head center and fingertips), six unchanged ground reaction force indicators, and eight dynamics/distance indicators. Release point is a throwing-wrist speed-peak 2D proxy, not observed ball release. Segment energies use assumed mass fractions and should not be treated as validated measurements.

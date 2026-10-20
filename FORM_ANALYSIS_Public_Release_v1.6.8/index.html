@@ -8,7 +8,7 @@
 <link href="./manifest.webmanifest" rel="manifest"/>
 <meta content="FORM ANALYSIS 公開プレビュー｜動画から姿勢・並進速度・全身参考支持反力を端末内で計算" name="description"/>
 <title>FORM ANALYSIS — Public Preview v1.6.8</title>
-<link href="./css/public-v1.6.8.css?rev=20261020com168" rel="stylesheet"/>
+<link href="./css/public-v1.6.8.css?rev=20261020smoothchoice168" rel="stylesheet"/>
 <link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%230c2936'/%3E%3Cpath d='M9 30V10h22' stroke='%23c7f36b' stroke-width='6' fill='none'/%3E%3C/svg%3E" rel="icon"/>
 </head>
 <body>
@@ -124,6 +124,7 @@
 <label>映像の投球方向<select id="directionInput"><option value="right">画面右へ投球</option><option value="left">画面左へ投球</option></select></label>
 <label>関節の左右識別<select id="mirrorSidesInput"><option value="no">通常（推奨）</option><option value="yes">左右入替（鏡像や認識誤りの場合）</option></select></label>
 <label>姿勢推定モデル<select id="modelInput"><option value="heavy">Heavy（精度優先）</option><option value="full">Full（速度優先）</option></select></label>
+<label>解析精度（時間平滑化）<select id="smoothingInput"><option value="1">1：平滑化なし（ピーク優先・ノイズ大）</option><option value="2">2：2フレーム</option><option selected value="3">3：3フレーム（標準）</option><option value="4">4：4フレーム</option><option value="5">5：5フレーム（安定優先・ピーク減衰）</option></select></label>
 <label>解析開始時刻（秒）<input id="startTimeInput" max="999" min="0" step="0.1" type="number" value="0"/></label>
 <label>解析終了時刻（秒・0＝開始から最大20秒）<input id="endTimeInput" max="999" min="0" step="0.1" type="number" value="0"/></label>
 
@@ -157,6 +158,6 @@
 </dialog>
 <div aria-live="polite" class="actionbar transient" id="actionbar" role="status"><span id="message">画面起動中…</span><button hidden="" id="runAnalysis">解析開始</button><button hidden="" id="cancelAnalysis">中止</button><button aria-label="通知を閉じる" id="dismissMessage" title="通知を閉じる" type="button">✕</button></div>
 <input accept="video/*,.mp4,.mov,.m4v,.webm" aria-label="動画ファイルを選択" class="native-file-input" id="videoFile" type="file"/>
-<script defer="" src="./js/public-v1.6.8.js?rev=20261020com168"></script>
+<script defer="" src="./js/public-v1.6.8.js?rev=20261020smoothchoice168"></script>
 </body>
 </html>

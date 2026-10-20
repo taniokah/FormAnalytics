@@ -157,3 +157,10 @@ The public release applies a conventional centered moving mean to the 2D project
 - 身体部分質量による2D重心推定（Chandler質量回帰＋de Leva性別比率補正）。実測・3D重心ではありません。
 - 各脚の合力は同一フレームの水平成分と鉛直成分の二乗和平方根で算出します。
 - 速度カードは重心、胸郭、骨盤、両肩、両肘、両手首の6枚。両手先速度カードは削除しました。
+
+
+### Temporal smoothing setting
+Settings allow 1–5 frames of temporal averaging (default: 3). Lower values preserve short-duration peaks but may be noisy; higher values smooth the signals but can reduce peaks. This is not a validated accuracy ranking.
+
+
+Public UI update: eight speed indicators (including head center and fingertips), six unchanged ground reaction force indicators, and eight dynamics/distance indicators. Release point is a throwing-wrist speed-peak 2D proxy, not observed ball release. Segment energies use assumed mass fractions and should not be treated as validated measurements.

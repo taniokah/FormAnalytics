@@ -10,3 +10,7 @@
 - iPhone実機Safariでの録画テストは未実施。
 
 - iPhone 13 mini: fullscreen player hides bottom app navigation, reserves bottom safe area and keeps recording/playback controls visible.
+
+
+### UI adjustment (2026-10-20)
+- Force metric cards now display drive foot F2 on the left and lead foot F1 on the right. Computational data, charts and CSV remain unchanged.

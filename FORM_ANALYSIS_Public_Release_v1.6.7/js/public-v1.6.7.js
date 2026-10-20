@@ -20,12 +20,12 @@ const PAGE={speed:{cards:[
  {id:'wrists',name:'両手首速度',keys:['wristL','wristR'],unit:'m/s',icon:'⌁',hint:'左右別'},
  {id:'hand-tips',name:'両手先速度',keys:['handTipL','handTipR'],unit:'m/s',icon:'⇢',hint:'左右人差し指先（MediaPipe 19・20）'}
  ]},forces:{cards:[
- {id:'lead-resultant',name:'踏込足 合力',tab:'踏込 合力',keys:['leadResultant'],unit:'N',icon:'↗',hint:'接地候補と支持点配分による参考値'},
  {id:'drive-resultant',name:'軸足 合力',tab:'軸足 合力',keys:['driveResultant'],unit:'N',icon:'↗',hint:'接地候補と支持点配分による参考値'},
- {id:'lead-vertical',name:'踏込足 鉛直反力',tab:'踏込 鉛直',keys:['leadVertical'],unit:'N',icon:'↑',hint:'接地候補と支持点配分による参考値'},
+ {id:'lead-resultant',name:'踏込足 合力',tab:'踏込 合力',keys:['leadResultant'],unit:'N',icon:'↗',hint:'接地候補と支持点配分による参考値'},
  {id:'drive-vertical',name:'軸足 鉛直反力',tab:'軸足 鉛直',keys:['driveVertical'],unit:'N',icon:'↑',hint:'接地候補と支持点配分による参考値'},
- {id:'lead-horizontal',name:'踏込足 水平反力',tab:'踏込 水平',keys:['leadHorizontal'],unit:'N',icon:'↔',hint:'骨盤中心向き＋の参考表示（方向は独立推定していません）'},
- {id:'drive-horizontal',name:'軸足 水平反力',tab:'軸足 水平',keys:['driveHorizontal'],unit:'N',icon:'↔',hint:'骨盤中心向き＋の参考表示（方向は独立推定していません）'}
+ {id:'lead-vertical',name:'踏込足 鉛直反力',tab:'踏込 鉛直',keys:['leadVertical'],unit:'N',icon:'↑',hint:'接地候補と支持点配分による参考値'},
+ {id:'drive-horizontal',name:'軸足 水平反力',tab:'軸足 水平',keys:['driveHorizontal'],unit:'N',icon:'↔',hint:'骨盤中心向き＋の参考表示（方向は独立推定していません）'},
+ {id:'lead-horizontal',name:'踏込足 水平反力',tab:'踏込 水平',keys:['leadHorizontal'],unit:'N',icon:'↔',hint:'骨盤中心向き＋の参考表示（方向は独立推定していません）'}
  ]},dynamics:{cards:[
  {id:'stride',name:'足首間前後距離',keys:['stride'],unit:'m',icon:'↔',hint:'画面内の左右足首間隔'},
  {id:'wristTravel',name:'投球手首の移動量',keys:['wristTravel'],unit:'m',icon:'⇢',hint:'開始フレームからの水平移動距離'},

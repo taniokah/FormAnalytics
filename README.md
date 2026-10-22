@@ -13,7 +13,7 @@
 
 FORM ANALYSIS is a browser-based application for visualizing baseball pitching mechanics from video recorded with a smartphone or other camera. It estimates pose, motion-derived velocities, and approximate per-foot ground reaction forces (GRFs) **locally in the browser**, without uploading the selected video to an analysis server.
 
-**Public Release v1.6.5** is a preview based on standard 2D pose estimation and simplified mechanics. It is not a validated 3D motion-capture or force-plate measurement system.
+**Public Release v1.6.8** is a preview based on standard 2D pose estimation and simplified mechanics. It is not a validated 3D motion-capture or force-plate measurement system.
 
 ### Open the app
 
@@ -73,9 +73,9 @@ Initial setup requires the browser to download application and model assets. Off
 
 If you report results obtained with this application in a paper, presentation, or research report, **cite the specific software version used**. When discussing the underlying research, also cite the relevant conference presentations below as appropriate.
 
-**Software (Public Release v1.6.5)**
+**Software (Public Release v1.6.8)**
 
-> Tanioka, H. (2026). *FORM ANALYSIS* (Public Release v1.6.5) [Computer software]. GitHub. https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.5
+> Tanioka, H. (2026). *FORM ANALYSIS* (Public Release v1.6.8) [Computer software]. GitHub. https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.8
 
 **Related research — SIT2026**
 
@@ -92,10 +92,10 @@ The **public application's implementation and validation conditions are not nece
 ```bibtex
 @misc{tanioka2026formanalysis,
   author       = {Tanioka, Hiroki},
-  title        = {{FORM ANALYSIS} (Public Release v1.6.5)},
+  title        = {{FORM ANALYSIS} (Public Release v1.6.8)},
   year         = {2026},
   howpublished = {Computer software, GitHub repository},
-  url          = {https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.5}
+  url          = {https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.8}
 }
 
 @inproceedings{tanioka2026sit,

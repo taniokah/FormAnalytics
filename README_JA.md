@@ -13,7 +13,7 @@
 
 FORM ANALYSIS は、スマートフォンなどで撮影した投球動画を使い、姿勢推定、身体各部の速度、脚別の推定床反力などをブラウザ内で計算・可視化するアプリケーションです。解析用動画を外部の解析サーバーへ送信せず、端末上で処理します。
 
-**公開版 v1.6.5** は、標準的な2D姿勢推定と簡易的な力学モデルに基づくプレビューです。公開されている結果は、精密な3次元計測や検証済みの床反力計測を意味するものではありません。
+**公開版 v1.6.8** は、標準的な2D姿勢推定と簡易的な力学モデルに基づくプレビューです。公開されている結果は、精密な3次元計測や検証済みの床反力計測を意味するものではありません。
 
 ### アプリを開く
 
@@ -89,10 +89,10 @@ GitHub Pages の公開設定、ファイル配置、ブラウザのキャッシ�
 ```bibtex
 @misc{tanioka2026formanalysis,
   author       = {Tanioka, Hiroki},
-  title        = {{FORM ANALYSIS} (Public Release v1.6.5)},
+  title        = {{FORM ANALYSIS} (Public Release v1.6.8)},
   year         = {2026},
   howpublished = {Computer software, GitHub repository},
-  url          = {https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.5}
+  url          = {https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.8}
 }
 
 @inproceedings{tanioka2026sit,

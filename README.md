@@ -2,7 +2,7 @@
 
 **A browser-based, markerless tool for visualizing baseball pitching mechanics from video.**
 
-**Public Release v1.6.5** · **Free for non-commercial research and education / Paid license required for commercial use** · [日本語 README](./README_JA.md)
+**Public Release v1.6.8** · **Free for non-commercial research and education / Paid license required for commercial use** · [日本語 README](./README_JA.md)
 
 > **Public preview**  
 > Results are approximate estimates, not force-plate measurements or medical/performance diagnoses.

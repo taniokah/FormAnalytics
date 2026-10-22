@@ -2,7 +2,7 @@
 
 **動画から投球フォームを可視化する、ブラウザベースのマーカーレス動作解析ツール。**
 
-**公開版 v1.6.5** · **研究・教育目的は無償／商用利用は別途有償契約が必要** · [English README](./README.md)
+**公開版 v1.6.8** · **研究・教育目的は無償／商用利用は別途有償契約が必要** · [English README](./README.md)
 
 > **公開プレビュー**  
 > 推定結果は参考値です。力板等による実測や、医学的・競技的な診断を代替するものではありません。
@@ -17,8 +17,8 @@ FORM ANALYSIS は、スマートフォンなどで撮影した投球動画を使
 
 ### アプリを開く
 
-- [公開版 v1.6.5 を開く（GitHub Pages）](https://taniokah.github.io/FormAnalytics/FORM_ANALYSIS_Public_Release_v1.6.5/)
-- [公開版 v1.6.5 のファイルを見る（GitHub）](./FORM_ANALYSIS_Public_Release_v1.6.5/)
+- [公開版 v1.6.8 を開く（GitHub Pages）](https://taniokah.github.io/FormAnalytics/FORM_ANALYSIS_Public_Release_v1.6.8/)
+- [公開版 v1.6.8 のファイルを見る（GitHub）](./FORM_ANALYSIS_Public_Release_v1.6.8/)
 
 GitHub Pages の公開設定、ファイル配置、ブラウザのキャッシュ状況によっては反映に時間がかかることがあります。
 
@@ -72,9 +72,9 @@ GitHub Pages の公開設定、ファイル配置、ブラウザのキャッシ�
 
 論文・学会発表・研究報告で本アプリの解析結果を使用する場合は、**使用したソフトウェアのバージョン**を明示し、次の「アプリケーション」の書誌情報を引用してください。研究手法の背景について記述する場合には、あわせて関連するSIT2026・WCB2026の発表を引用してください。
 
-**アプリケーション（公開版 v1.6.5）**
+**アプリケーション（公開版 v1.6.8）**
 
-> 谷岡 広樹 (2026)．*FORM ANALYSIS*（公開版 v1.6.5）[コンピュータソフトウェア]．GitHub．https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.5
+> 谷岡 広樹 (2026)．*FORM ANALYSIS*（公開版 v1.6.8）[コンピュータソフトウェア]．GitHub．https://github.com/taniokah/FormAnalytics/tree/main/FORM_ANALYSIS_Public_Release_v1.6.8
 
 **関連研究：SIT2026（日本語発表）**
 

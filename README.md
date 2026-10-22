@@ -17,8 +17,8 @@ FORM ANALYSIS is a browser-based application for visualizing baseball pitching m
 
 ### Open the app
 
-- [Launch Public Release v1.6.5 (GitHub Pages)](https://taniokah.github.io/FormAnalytics/FORM_ANALYSIS_Public_Release_v1.6.5/)
-- [Browse the v1.6.5 files (GitHub)](./FORM_ANALYSIS_Public_Release_v1.6.5/)
+- [Launch Public Release v1.6.8 (GitHub Pages)](https://taniokah.github.io/FormAnalytics/FORM_ANALYSIS_Public_Release_v1.6.8/)
+- [Browse the v1.6.8 files (GitHub)](./FORM_ANALYSIS_Public_Release_v1.6.8/)
 
 GitHub Pages configuration, deployment propagation, or browser caching may affect availability of the latest files.
 

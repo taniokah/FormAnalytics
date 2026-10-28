@@ -1,0 +1,16 @@
+# FORM ANALYSIS Public Release v1.6.7
+
+- プレビュー再生コントロールの上に「↓ 動画保存」を配置。
+- 動画ON/OFF、骨格ON/OFF、床反力矢印ON/OFFを合成した最大20秒の動画を端末内で作成。
+- MP4対応環境ではMP4、その他の対応環境ではWebM。保存ボタン横の「音声あり」で元動画音声の記録を選択可能（初期OFF、ブラウザ対応が必要）。
+- 保存中の進捗表示、保存中止、保存ファイルへの再アクセスリンクを追加。
+- 長辺最大1280ピクセル、最大30fpsでリアルタイム録画。
+- 5フレーム平滑化、頭部ランドマーク（円なし）、床反力、従来の設定と解析処理を維持。
+- MediaRecorder/Canvas captureStreamに非対応のブラウザでは保存できない旨を表示。
+- iPhone実機Safariでの録画テストは未実施。
+
+- iPhone 13 mini: fullscreen player hides bottom app navigation, reserves bottom safe area and keeps recording/playback controls visible.
+
+
+### UI adjustment (2026-10-20)
+- Force metric cards now display drive foot F2 on the left and lead foot F1 on the right. Computational data, charts and CSV remain unchanged.

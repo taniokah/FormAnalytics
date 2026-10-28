@@ -176,3 +176,8 @@ The **04 Angular Velocity / 角速度** tab plots apparent upper-trunk, lower-tr
 ### v1.7 angular plot update (2026-10-28)
 
 The three 04 Angular Velocity metric cards retain the estimated peak angular speeds (deg/s). The corresponding chart and live series selectors now show apparent projected *angles* (deg): upper torso, lower torso, and twist (upper minus lower, frame-aligned). CSV includes both angle and angular-velocity series. These 2D projection values are **not measured 3D axial rotation angles**.
+
+### v1.7 Force overlay visibility on all four chart tabs (2026-10-28)
+
+- Tabs 01/03/04: `床反力 N` controls the drive/lead-foot resultant force overlay on a separate N scale. Tab 04 continues plotting projected angle (°) on the primary axis and displaying angular-velocity peak cards (°/s).
+- Tab 02: the same checkbox hides/restores selected GRF series, without changing their individual selections. The checkbox state is shared across tabs. All force values are estimates, not measurements.

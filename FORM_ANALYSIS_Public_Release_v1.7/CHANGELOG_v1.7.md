@@ -17,3 +17,11 @@
 - Angular velocity continues to be calculated by differentiating the corresponding angles; CSV includes both angular velocity (°/s) and angle (°) columns.
 - Existing 01–03 behavior, card heights, shared chart height and output settings remain unchanged.
 - These are 2D apparent projected angles, NOT validated 3D axial rotation measurements.
+
+## 2026-10-28 — Show force overlay toggle in all four charts (v1.7)
+
+- The existing `床反力 N` checkbox now remains available in tabs 01–04.
+- 01/03/04: toggles the separate drive/lead resultant force series (F2/F1) on a secondary N axis; angle chart in 04 keeps the primary ° axis and peak °/s cards.
+- 02: switches its selected foot-force curves off/on while preserving which force series are selected; off-state displays an explicit message instead of meaningless scale values.
+- The checkbox state is shared across chart tabs and remains in effect when switching tabs.
+- Bumped offline cache identifier and stylesheet/script asset revision; no change to the biomechanical calculations.

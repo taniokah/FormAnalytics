@@ -790,16 +790,30 @@ function buildCards(){
   }
   $('pageHelp').textContent=state.page==='angular'?'【2D投影参考推定】上部カードは角速度ピーク（°/s）、グラフは上胴角度・下胴角度・捻転角度（°）です。捻転角度＝上胴角度−下胴角度（同一フレーム）。肩・骨盤の投影幅から得る見かけの角度で、絶対的な3D軸回旋角度ではありません。カメラ方向・遮蔽・身体の傾きに左右され、欠測はゼロとして扱いません。':state.page==='forces'?'【参考推定】足部動作と左右足の高さ差から接地候補を推測し、支持点・推定重心・加速度から床反力を配分。脚別水平値は重心向きを正とする参考表示で、各足の実際の作用方向は独立には推定していません。▲離地、▼接地（候補）。':state.page==='dynamics'?'推定リリースポイントは、軸足足首の後方基準位置から投球側人差し指先（欠測時は手首）までの前方距離です。グラフの◆は投球期に最初に現れる有意な伸展ピークの推定時刻です。実際のボール離手点ではありません。部位エネルギーは概算質量比と速度による参考値です。':'速度は画像内2D位置の変化から求めています。重心はChandler身体部分質量モデルによる2D参考推定です。';
   $('pageHelp').title=$('pageHelp').textContent;
-  $('forceLayerToggle').closest('label').hidden=state.page==='forces'||state.page==='angular';
+  // Keep the same force visibility control in all four chart pages.
+  // In 02 it controls the selected force curves themselves; in the other
+  // pages it controls the separate F1/F2 resultant overlay on the N axis.
+  const forceToggle=$('forceLayerToggle');
+  const forceLabel=forceToggle.closest('label');
+  forceLabel.hidden=false;
+  const forceHint=state.page==='forces'
+    ? '02 床反力：選択中の床反力系列をまとめて表示／非表示（選択は保持）'
+    : '踏込足 F1 と軸足 F2 の床反力（各合力）を右側 N 軸に重ねて表示／非表示';
+  forceLabel.title=forceHint;
+  forceToggle.setAttribute('aria-label',forceHint);
 }
 const svgNode=(name,props={},str)=>{const n=document.createElementNS('http://www.w3.org/2000/svg',name);Object.entries(props).forEach(([k,v])=>n.setAttribute(k,v));if(str!==undefined)n.textContent=str;return n;};
 function axisRange(nums,min=1){const v=nums.filter(Number.isFinite);if(!v.length)return [0,min];let lower=Math.min(0,...v),upper=Math.max(0,...v);const pad=Math.max((upper-lower)*.1,.1);lower=lower<0?lower-pad:0;upper=Math.max(min,upper+pad);return [lower,upper];}
 function chart(){
   const svg=$('plot'),legend=$('legend');svg.replaceChildren();legend.replaceChildren();
-  const rows=state.analysis?.samples??[],keys=seriesKeys();
+  const rows=state.analysis?.samples??[];
+  // Page 02 consists entirely of force series; OFF hides the plotted
+  // force curves while retaining the user's series selections.
+  const forceSeriesHidden=state.page==='forces'&&!state.showForces;
+  const keys=forceSeriesHidden?[]:seriesKeys();
   if(!rows.length){svg.append(svgNode('text',{x:Math.max(160,svg.getBoundingClientRect().width/2),y:79,'text-anchor':'middle','font-size':13,fill:'#799199'},'動画を読み込んで解析してください'));return;}
   // Single toggle overlays two separately estimated foot-resultant magnitudes on the same N scale.
-  const overlay=state.showForces&&state.page!=='forces'&&state.page!=='angular'?['driveResultant','leadResultant']:[];
+  const overlay=state.showForces&&state.page!=='forces'?['driveResultant','leadResultant']:[];
   const vals=rows.flatMap(r=>keys.map(k=>r[k])),v2=rows.flatMap(r=>overlay.map(k=>r[k]));
   const [low,high]=axisRange(vals,1),[fLow,fHigh]=axisRange(v2,100);
   // Recompute chart geometry from the actual container width; keep labels in bounds.
@@ -817,13 +831,17 @@ function chart(){
     const cy=bounds.y1-i/4*(bounds.y1-bounds.y0),cx=bounds.x0+i/4*(bounds.x1-bounds.x0);
     svg.append(svgNode('line',{x1:bounds.x0,y1:cy,x2:bounds.x1,y2:cy,stroke:'#dde8e8'}));
     svg.append(svgNode('line',{x1:cx,y1:bounds.y0,x2:cx,y2:bounds.y1,stroke:'#e6eeee','stroke-dasharray':'3 6'}));
-    const l=low+i/4*(high-low);svg.append(svgNode('text',{x:bounds.x0-6,y:cy+4,'text-anchor':'end','font-size':10,fill:'#607886'},Math.abs(l)>=20?String(Math.round(l)):l.toFixed(1)));
+    const l=low+i/4*(high-low);if(!forceSeriesHidden)svg.append(svgNode('text',{x:bounds.x0-6,y:cy+4,'text-anchor':'end','font-size':10,fill:'#607886'},Math.abs(l)>=20?String(Math.round(l)):l.toFixed(1)));
     if(overlay.length){const v=fLow+i/4*(fHigh-fLow);svg.append(svgNode('text',{x:bounds.x1+6,y:cy+4,'font-size':10,fill:'#c77a27'},String(Math.round(v))));}
     svg.append(svgNode('text',{x:cx,y:viewH-8,'text-anchor':'middle','font-size':10,fill:'#667d89'},(rows[0].t+i/4*dur).toFixed(2)));
   }
   const selectedCard=chartDefs().find(c=>state.selected[state.page].has(c.id));
   const unit=selectedCard?(selectedCard.chartUnit||selectedCard.unit):state.page==='angular'?'°':'';
-  svg.append(svgNode('text',{x:bounds.x0,y:10,'font-size':10,fill:'#718998'},unit));
+  if(!forceSeriesHidden)svg.append(svgNode('text',{x:bounds.x0,y:10,'font-size':10,fill:'#718998'},unit));
+  if(forceSeriesHidden)svg.append(svgNode('text',{
+    x:(bounds.x0+bounds.x1)/2,y:(bounds.y0+bounds.y1)/2,
+    'text-anchor':'middle','font-size':13,fill:'#718998'
+  },'床反力は非表示です（床反力 N をONで再表示）'));
   if(overlay.length)svg.append(svgNode('text',{x:bounds.x1+3,y:10,'font-size':10,fill:'#c77a27'},'床反力 (N)'));
   for(const key of [...keys,...overlay]){
     const isForce=overlay.includes(key),parts=[];let started=false;

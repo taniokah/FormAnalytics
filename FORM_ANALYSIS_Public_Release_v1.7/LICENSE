@@ -1,0 +1,126 @@
+FORM ANALYSIS RESEARCH AND NON-COMMERCIAL LICENSE
+Version 1.0 — October 17, 2026
+
+Copyright (c) 2026 Hiroki Tanioka and other applicable rightsholders.
+All rights reserved except as expressly licensed below.
+
+IMPORTANT: This is a proprietary, source-available license, NOT an open-source
+license. Commercial Use requires a separate PAID agreement entered into before
+such use begins. This document applies only to components for which the
+Licensor has the authority to grant rights, and not to separately licensed
+third-party components.
+
+1. Definitions
+
+"Software" means the FORM ANALYSIS public-release application, including its
+original source code and accompanying documentation, to the extent owned or
+controlled by the Licensor, as distributed with this license. It excludes
+third-party software, machine-learning models, WASM files, and other assets
+that have separate upstream licenses or terms.
+
+"Licensor" means the copyright and, where relevant, patent rightsholder(s)
+authorized to license the corresponding rights in the Software. The project
+maintainer acts on behalf of the Licensor only to the extent authorized.
+
+"Non-Commercial Use" means use not primarily intended for, or directed toward,
+commercial advantage, monetary compensation, or the development, delivery,
+or improvement of commercial products or services. Academic research,
+education, teaching, and personal non-commercial evaluation generally qualify.
+A researcher's salary, ordinary tuition, or an academic research grant does
+not, by itself, make a use commercial. Research commissioned primarily to
+support a client's commercial product or service may be Commercial Use.
+
+"Commercial Use" means any use primarily intended for, or directed toward,
+commercial advantage, monetary compensation, or business operations. Examples
+include paid biomechanical analysis or coaching, use in a commercial gym or
+training service, integration into a commercial product, commercial research
+and development, paid consulting, and paid deployment for another business.
+The user's organizational type alone does not settle classification; the
+actual purpose and circumstances of use control. Mixed or uncertain cases
+require written clarification from the Licensor before commercial activity.
+
+2. Permission for Non-Commercial Use (No Charge)
+
+Subject to this license, the Licensor grants a non-exclusive, worldwide,
+royalty-free, non-transferable permission to download, access, run, study,
+copy, and adapt the Software solely for Non-Commercial Use. The Software may
+be shared for Non-Commercial Use only if all copyright notices, this license,
+and third-party notices are retained; changes must be clearly identified;
+and recipients receive no broader rights than this license permits. No
+permission is given to sell the Software or distribute it as part of a
+commercial offering.
+
+Researchers may publish findings, graphs, and results derived from permitted
+Non-Commercial Use. Scholarly citation of the software version and related
+scientific publications is requested as good academic practice.
+
+3. Commercial Use — Separate Paid License Required
+
+NO COMMERCIAL USE IS AUTHORIZED UNDER THIS LICENSE. Before any Commercial
+Use, the prospective user must obtain a separate written commercial license
+agreement signed by the party or parties with authority to grant the relevant
+rights, and must pay the fees required by that agreement. A request for a
+license, a public GitHub fork, or mere access to the application does not
+constitute commercial permission. Commercial terms and fees are negotiated
+separately with the project maintainer or authorized rightsholder.
+
+4. Patents and Other Intellectual Property
+
+Technologies relevant to certain FORM ANALYSIS features are the subject of
+pending patent applications. No statement in this license represents that a
+patent has issued or that its claims will be allowed.
+
+Solely to the extent that the Licensor owns or controls the applicable rights,
+the Licensor permits the use of such patent rights only as necessary to
+perform Non-Commercial Use expressly authorized under Section 2. This limited
+permission does not extend to Commercial Use, any separately licensed
+product or service, unrelated implementations, or third-party patent rights.
+Commercial patent rights, if needed and available, must be addressed in the
+separate written paid agreement. All other rights are reserved.
+
+Nothing in this document grants any right to the FORM ANALYSIS name, marks,
+logos, or other brands, except to identify the Software accurately.
+
+5. Third-Party Components
+
+Third-party software and assets are governed by their own applicable licenses
+and conditions. For example, MediaPipe components may be governed by the
+Apache License, Version 2.0, and particular model files may have separate
+terms. See THIRD_PARTY_NOTICE.md and the notices accompanying the relevant
+assets. This license does not alter or restrict any permission the
+rightsholders of those components independently grant.
+
+6. Conditions, Termination, and Reservation of Rights
+
+Users must preserve copyright and license notices in copies, identify
+modifications, and must not misrepresent the origin, accuracy, or endorsement
+of the Software. If a user breaches these terms, the permissions in this
+license terminate automatically; permissions may be reinstated if the breach
+is fully cured within 30 days after written notice from the Licensor, unless
+otherwise required by applicable law. All rights not expressly granted remain
+reserved. Applicable statutory exceptions are unaffected.
+
+7. No Warranty; Limitation of Liability
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTIES OF ANY KIND, TO THE
+MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW. ESTIMATED MOTION AND GROUND
+REACTION FORCE RESULTS ARE NOT DIRECT MEASUREMENTS, CLINICAL ADVICE, OR A
+SUBSTITUTE FOR VALIDATED INSTRUMENTATION. TO THE MAXIMUM EXTENT PERMITTED BY
+APPLICABLE LAW, THE LICENSOR SHALL NOT BE LIABLE FOR DAMAGES ARISING FROM
+USE OF THE SOFTWARE.
+
+8. Governing Law
+
+This license is governed by the laws of Japan, excluding conflict-of-law
+rules, to the extent permitted by applicable law.
+
+9. Contact for Commercial Licensing
+
+Contact the FORM ANALYSIS project maintainer through the project repository:
+https://github.com/taniokah/FormAnalytics
+Do not disclose confidential business information in public GitHub issues.
+
+This license does not grant rights belonging to persons or institutions other
+than the Licensor. The ownership of employee-created works and any jointly
+held patent rights must be confirmed before relying on this license to grant
+third-party rights.

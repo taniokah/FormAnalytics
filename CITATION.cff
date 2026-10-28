@@ -5,10 +5,10 @@ message: >-
   references in README.md.
 type: software
 title: FORM ANALYSIS (Public Release)
-version: 1.6.8
+version: 1.7
 authors:
   - family-names: Tanioka
     given-names: Hiroki
 repository-code: https://github.com/taniokah/FormAnalytics
-url: https://taniokah.github.io/FormAnalytics/FORM_ANALYSIS_Public_Release_v1.6.8/
+url: https://taniokah.github.io/FormAnalytics/FORM_ANALYSIS_Public_Release_v1.7/
 license-url: https://github.com/taniokah/FormAnalytics/blob/main/LICENSE

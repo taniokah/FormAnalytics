@@ -172,3 +172,7 @@ Public UI update: eight speed indicators (including head center and fingertips),
 ### v1.7 — Angular velocities (2D projected estimates)
 
 The **04 Angular Velocity / 角速度** tab plots apparent upper-trunk, lower-trunk, and relative twist angular velocities in **deg/s**. The algorithm uses the projected horizontal separation of the shoulder/hip landmarks and temporal derivatives, inspired by the supplied MotionCheck p5.js prototype. Twist angular velocity equals upper minus lower in the same frame. The result depends on throw hand, video direction, viewpoint, landmark reliability, and selectable smoothing (1–5 frames). **These are not observed 3D axial angular velocities.** Invalid observations appear as missing values; graphs/CSV never replace them by zero.
+
+### v1.7 angular plot update (2026-10-28)
+
+The three 04 Angular Velocity metric cards retain the estimated peak angular speeds (deg/s). The corresponding chart and live series selectors now show apparent projected *angles* (deg): upper torso, lower torso, and twist (upper minus lower, frame-aligned). CSV includes both angle and angular-velocity series. These 2D projection values are **not measured 3D axial rotation angles**.

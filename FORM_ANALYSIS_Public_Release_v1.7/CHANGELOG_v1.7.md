@@ -9,3 +9,11 @@
 
 ## Limitations
 2D projected angle change is **not** measured 3D axial rotation. Absolute angular speed can be affected by camera view, body inclination, occlusion, sign convention, and projection singularities.
+
+## 2026-10-28 — 04 角速度 chart uses angles (version remains v1.7)
+
+- Three upper cards remain peak **angular velocity** values (°/s).
+- The three selectable chart series and their live legend pills now show **projected angle** (°): `upperAngle`, `lowerAngle`, and `twistAngle = upperAngle - lowerAngle` per frame.
+- Angular velocity continues to be calculated by differentiating the corresponding angles; CSV includes both angular velocity (°/s) and angle (°) columns.
+- Existing 01–03 behavior, card heights, shared chart height and output settings remain unchanged.
+- These are 2D apparent projected angles, NOT validated 3D axial rotation measurements.

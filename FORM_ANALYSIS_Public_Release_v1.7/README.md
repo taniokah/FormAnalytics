@@ -150,7 +150,7 @@ During analysis, a determinate progress bar replaces the playing video preview. 
 
 ### Position smoothing (v1.7)
 
-The public release applies a conventional centered moving mean to the 2D projected Chandler/de Leva CoM estimate, thorax, upper-limb joint tracks, ankle spacing, and foot support locations **before** differentiation and approximate force allocation. Each valid center uses up to five frames (two before, itself, and two after), limited to observations within 0.16 s. Missing centers are not synthesized. This does **not** implement repeat inference, confidence-weighted fusion, or any unreleased research algorithm. The contact-event heuristic itself remains unchanged.
+The public release performs temporal averaging **only once on MediaPipe 2D keypoint coordinates** (x/y), before calculating Chandler/de Leva CoM, composite landmark positions, angles, velocities, accelerations, GRF estimates and release distances. The selectable window is 1–5 frames (default 3), with only observations within 0.16 s considered. Missing center keypoints remain missing. **No subsequent temporal smoothing** is applied to any derived metric. This does **not** implement repeat inference, confidence-weighted fusion, or any unreleased research algorithm. The contact-event heuristic itself remains unchanged.
 
 
 ### v1.7 / 更新事項
@@ -184,3 +184,10 @@ The three 04 Angular Velocity metric cards retain the estimated peak angular spe
 
 ### Angular page axis switching
 The angular page provides separate apparent-angle (deg) and angular-rate (deg/s) curves for upper torso, pelvis and twist. Selecting a different unit clears the prior series and switches the primary graph axis. Angular-rate summary cards display peaks.
+
+### 2026-10-29 — Keypoint-only smoothing (v1.7)
+
+- The configured 1–5 frame moving average is applied **only** to valid MediaPipe keypoint x/y coordinates, once per analysis. Default is 3. No keypoint interpolation or repeated pose inference.
+- Chandler projected CoM, chest/head/pelvis/foot composite positions, translational speed, acceleration, GRF components/resultants, energy, release-distance trace, projected upper/lower/twist angles and angular velocities are computed directly from the once-smoothed keypoints, **without additional temporal filtering**.
+- Removed separate moving averages for angular width/angle, release distance, and the 3-frame contact-coordinate median. Three consecutive observations for contact *state recognition* and median/quantile estimates of clip-level reference positions remain; these are not smoothing of a metric time series.
+- The plot, peak cards, CSV, and pose overlay use the same processed frame data. Keypoint smoothing can still attenuate abrupt peaks.

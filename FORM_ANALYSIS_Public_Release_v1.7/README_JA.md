@@ -193,3 +193,9 @@ Public UI update: eight speed indicators (including head center and fingertips),
 - Chandler重心や各部の合成位置、並進速度、加速度、床反力、エネルギー、リリース距離、上胴・下胴・捻転の角度／角速度について、**計算後の時間平滑化をすべて廃止**しました。
 - 角度・幅系列の再移動平均、リリース距離の移動平均、接地用足部座標の3フレーム中央値フィルタも削除。接地状態の3連続フレーム判定、基準位置の中央値・分位点は**時系列平滑化ではない**ため保持しています。
 - グラフ、ピークカード、CSV、姿勢オーバーレイは同じ処理済みキーポイントから導出します。キーポイント平滑化自体によるピーク減衰は残る可能性があります。
+
+
+### v1.7: standard local-statistics filter / 既存の局所Wiener型補正
+- Keypoints x/y only: choose `Wiener (local variance-adaptive, default)` or `moving mean (legacy)`, window 1–5 (3 default).
+- No second temporal filter applied to derivatives or projected angles.
+- This standard method is **not** the nonpublic, motion-consistency or biomechanics-aware peak selection method. A 3-frame variance cannot identify whether a spike is real motion or landmark noise; no accuracy gain is guaranteed.

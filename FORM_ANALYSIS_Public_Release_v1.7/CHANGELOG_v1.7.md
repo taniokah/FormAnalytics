@@ -44,3 +44,10 @@
 - 接地判定用の足部座標3点中央値フィルタを削除（3連続観測によるイベント判定は維持）。
 - 同じ処理済みキーポイントを骨格描画・グラフ・CSV・カード表示で使用。
 - 公開版の範囲を維持し、非公開Alpha専用の独自アルゴリズムは取り込まない。
+
+
+## 2026-10-29: conventional local Wiener-style option (version remains v1.7)
+- Introduced user-selectable keypoint-only temporal method near pose model settings: conventional **local Wiener-style variance-adaptive** smoothing (default), or previous simple moving average. Sample window 1–5, default 3.
+- The local gain uses only three-point-neighborhood mean and variance, and a clip-level lower-quartile local variance estimate. This is a conventional local-statistics filter, NOT the private Alpha algorithm.
+- One pass on original MediaPipe keypoints x/y. No additional smoothing on CoM, speed, acceleration, GRF, angle or angular velocity; missing center keypoints remain missing.
+- A high local variance can be caused by either motion or a false single-frame outlier: no guarantee of preserved true peak or noise removal. No event/biomechanical confidence-based adaptation implemented.

@@ -191,3 +191,9 @@ The angular page provides separate apparent-angle (deg) and angular-rate (deg/s)
 - Chandler projected CoM, chest/head/pelvis/foot composite positions, translational speed, acceleration, GRF components/resultants, energy, release-distance trace, projected upper/lower/twist angles and angular velocities are computed directly from the once-smoothed keypoints, **without additional temporal filtering**.
 - Removed separate moving averages for angular width/angle, release distance, and the 3-frame contact-coordinate median. Three consecutive observations for contact *state recognition* and median/quantile estimates of clip-level reference positions remain; these are not smoothing of a metric time series.
 - The plot, peak cards, CSV, and pose overlay use the same processed frame data. Keypoint smoothing can still attenuate abrupt peaks.
+
+
+### v1.7: standard local-statistics filter / 既存の局所Wiener型補正
+- Keypoints x/y only: choose `Wiener (local variance-adaptive, default)` or `moving mean (legacy)`, window 1–5 (3 default).
+- No second temporal filter applied to derivatives or projected angles.
+- This standard method is **not** the nonpublic, motion-consistency or biomechanics-aware peak selection method. A 3-frame variance cannot identify whether a spike is real motion or landmark noise; no accuracy gain is guaranteed.

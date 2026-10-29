@@ -45,7 +45,7 @@ const PAGE={speed:{cards:[
  {id:'lower',name:'下胴角速度',keys:['lowerAngular'],unit:'°/s',icon:'⟳'},
  {id:'twist',name:'捻転角速度',keys:['twistAngular'],unit:'°/s',icon:'⟲'}
  ]}};
-const DEFAULTS={height:175,weight:70,sex:'unspecified',hand:'right',direction:'right',mirrorSides:'no',model:'heavy',smoothing:3,fps:30,startTime:0,endTime:0,scale:'auto',manualScale:.002};
+const DEFAULTS={height:175,weight:70,sex:'unspecified',hand:'right',direction:'right',mirrorSides:'no',model:'heavy',smoothing:3,smoothingMode:'wiener',fps:30,startTime:0,endTime:0,scale:'auto',manualScale:.002};
 const state={config:{...DEFAULTS},page:'speed',selected:{speed:new Set(['com','thorax','pelvis']),forces:new Set(['lead-resultant','drive-resultant']),dynamics:new Set(['stride']),angular:new Set(['upper-angle','lower-angle','twist-angle'])},showForces:true,fileURL:null,mode:'empty',analysis:null,t:0,playing:false,analyzing:false,abort:null,showPose:true,showVideo:true,showArrows:true,guide:true};
 const safe=n=>Number.isFinite(n)?n:null;
 const lookup=(pose,index)=>{const v=pose?.[index];return v&&Number.isFinite(v.x)&&Number.isFinite(v.y)&&Math.min(v.visibility??1,v.presence??1)>=KEY_MIN?v:null;};
@@ -353,26 +353,73 @@ function allocateFootForcesFiled({fzTotal,fxTotal,pelvis,leadFoot,driveFoot,scal
     driveResultant:Math.hypot(driveVertical,driveHorizontal),
     shareLead:share,allocationMethod:contactPhase===1?'lead-airborne':contactPhase===3?'drive-airborne':'filed-support-point-proxy-both-supported'};
 }
-// The ONLY temporal smoothing in public v1.7: once on each valid MediaPipe
-// 2D keypoint (x/y), before any composite landmarks, CoM, angles or derivatives.
-// Missing/unreliable center landmarks stay missing; we never fill gaps, and
-// visibility/presence at the center frame remain the original observations.
-function smoothKeypointFrames(frames,windowSize=3){
+// The ONLY temporal filtering in public v1.7 is this ONE pass over raw
+// MediaPipe keypoints. The two choices are conventional moving mean and
+// local-statistics Wiener-style denoising (J. S. Lee, 1981; Lim, 1990).
+// No sport-specific peak detection, body mechanics, Bayesian event logic,
+// or proprietary research algorithms are used to alter smoothing weights.
+function smoothKeypointFrames(frames,windowSize=3,mode='wiener'){
   const n=Math.max(1,Math.min(5,Math.round(Number(windowSize)||3)));
   const before=Math.floor((n-1)/2),after=n-1-before;
   const times=frames.map(frame=>frame.t);
   const tracks=Array.from({length:33},(_,id)=>frames.map(frame=>lookup(frame.pose,id)));
-  const smoothed=tracks.map(track=>track.map((point,i)=>{
-    if(!point)return null;
-    if(n===1)return {...point};
-    let sx=0,sy=0,count=0;
+  const useWiener=mode==='wiener' && n>1;
+  function neighbors(track,i){
+    const values=[];
     for(let j=Math.max(0,i-before);j<=Math.min(track.length-1,i+after);j++){
       const p=track[j];
-      if(!p||!Number.isFinite(times[j])||Math.abs(times[j]-times[i])>.16)continue;
-      sx+=p.x;sy+=p.y;count++;
+      if(p&&Number.isFinite(times[j])&&Number.isFinite(times[i])
+         &&Math.abs(times[j]-times[i])<=.16)values.push(p);
     }
-    return count?{...point,x:sx/count,y:sy/count}:{...point};
-  }));
+    return values;
+  }
+  function meanVariance(values,axis){
+    if(!values.length)return null;
+    let mean=0;
+    for(const p of values)mean+=p[axis];
+    mean/=values.length;
+    let variance=0;
+    for(const p of values)variance+=(p[axis]-mean)**2;
+    return {mean,variance:variance/values.length};
+  }
+  const smoothed=tracks.map(track=>{
+    const windows=track.map((_,i)=>neighbors(track,i));
+    const stats=windows.map(values=>({x:meanVariance(values,'x'),y:meanVariance(values,'y')}));
+    // Standard robust background-noise estimate: low quartile of the local
+    // variances across the clip, independently for each joint and coordinate.
+    // This uses NO true/false peak label or specialized motion criterion.
+    const noise={x:0,y:0};
+    if(useWiener){
+      for(const axis of ['x','y']){
+        const variances=stats.map((st,i)=>windows[i].length>=n?st[axis]?.variance:null)
+          .filter(v=>Number.isFinite(v)&&v>=0).sort((a,b)=>a-b);
+        if(variances.length){
+          const pos=(variances.length-1)*.25,j=Math.floor(pos),fraction=pos-j;
+          noise[axis]=variances[j]*(1-fraction)+variances[Math.min(variances.length-1,j+1)]*fraction;
+        }
+      }
+    }
+    return track.map((point,i)=>{
+      // Missing/unreliable keypoint in the center remains missing; never infer
+      // a landmark by interpolating adjacent frames.
+      if(!point)return null;
+      if(n===1)return {...point};
+      const values=windows[i];
+      if(!values.length)return {...point};
+      const ret={...point};
+      for(const axis of ['x','y']){
+        const st=stats[i][axis];
+        if(!st)continue;
+        if(!useWiener){ret[axis]=st.mean;continue;}
+        // Classical local Wiener form: filtered = mean + gain*(raw-mean).
+        // gain is bounded [0,1], and cannot amplify a raw coordinate.
+        const gain=st.variance>1e-16
+          ?Math.max(0,Math.min(1,(st.variance-noise[axis])/st.variance)):0;
+        ret[axis]=st.mean+gain*(point[axis]-st.mean);
+      }
+      return ret;
+    });
+  });
   return frames.map((frame,i)=>({...frame,pose:Array.isArray(frame.pose)?smoothed.map(track=>track[i]):null}));
 }
 // A release distance proxy using the same reference and peak-search convention
@@ -469,7 +516,7 @@ function angularProjectedWidths(frames,times,params){
 function computePublicMetrics(inputFrames,params,width,heightPx){
   const smoothingFrames=Math.max(1,Math.min(5,Math.round(Number(params.smoothing)||3)));
   // Single common keypoint smoothing pass used by ALL outputs and overlays.
-  const frames=smoothKeypointFrames(inputFrames,smoothingFrames);
+  const frames=smoothKeypointFrames(inputFrames,smoothingFrames,params.smoothingMode);
   const times=frames.map(f=>f.t),flipX=params.direction==='left'?-1:1;
   const angular=angularProjectedWidths(frames,times,params);
   const measured=parseMeasurements(frames,params,width,heightPx),scale=measured.metersPerPixel;
@@ -1404,7 +1451,7 @@ async function snapshot(){
 }
 function exportCsv(){if(!stateReady()){notify('先に解析を実行してください');return;}
   const keys=['t','contactPhase','contactSource','footHeightDiffM','leadContact','driveContact','comSpeed','headSpeed','pelvisSpeed','thoraxSpeed','shoulderL','shoulderR','elbowL','elbowR','wristL','wristR','handTipL','handTipR','forceTotal','forceVertical','forceHorizontal','leadResultant','driveResultant','leadVertical','driveVertical','leadHorizontal','driveHorizontal','leadHorizontalWorld','driveHorizontalWorld','stride','wristTravel','energy','releasePoint','upperAngle','lowerAngle','twistAngle','upperAngular','lowerAngular','twistAngular','comEnergy','pelvisEnergy','shoulderEnergyL','shoulderEnergyR','elbowEnergyL','elbowEnergyR','wristEnergyL','wristEnergyR','tipEnergyL','tipEnergyR','shareLead'];
-  const lines=['# FORM ANALYSIS Public Preview v1.7','# Chandler segment-mass based 2D projected CoM (sex-stratified de Leva correction), research estimate; NOT measured 3D CoM',`# MediaPipe keypoints x/y ONLY: selected smoothing_frames=${state.config.smoothing} (1=none; max 5; no missing-center imputation); all derived quantities computed afterward without extra smoothing`,'# Keypoint-only single-pass smoothing: no separate temporal filtering of CoM, velocity, acceleration, forces, projected angles/angular velocity or release distance; NOT measured foot GRF',`# height_cm=${state.config.height} weight_kg=${state.config.weight} sex(anthropometric)=${state.config.sex}`,'# Contact candidates: sequential foot motion + relative bilateral toe/heel/ankle height difference, 3 stable observations; 2D unvalidated heuristic', '# footHeightDiffM: positive means lead foot appears higher than drive; camera perspective, steps and mounds can misclassify support', '# leadHorizontal/driveHorizontal: inward-positive reference magnitudes (foot -> CoM); each resultant equals hypot(vertical,horizontal) within the SAME frame', '# *HorizontalWorld: signed pitch-direction allocation, sums to forceHorizontal (not the inward-display convention)', '# releasePoint: estimated forward distance (m) from drive-ankle backward quantile to throwing index fingertip (wrist fallback); diamond = first prominent extension peak, NOT measured ball release', '# upperAngle/lowerAngle: apparent projected shoulder/hip angles in deg (NOT true 3D yaw); plotted on 04', '# twistAngle = upperAngle - lowerAngle in deg at the SAME frame (may be negative)', '# upperAngular/lowerAngular: apparent angular velocities in deg/s derived from the angle tracks; switchable graph with degree/s axis; card values are absolute peaks', '# twistAngular = upperAngular - lowerAngular at the same frame; NOT measured 3D torso torsion',`# contact_assumption=${state.analysis.contactAssumption}`,...state.analysis.events.map(e=>`# event=${e.foot}_${e.type},time_s=${e.t.toFixed(3)},quality=candidate`),keys.join(',')];
+  const lines=['# FORM ANALYSIS Public Preview v1.7','# Chandler segment-mass based 2D projected CoM (sex-stratified de Leva correction), research estimate; NOT measured 3D CoM',`# MediaPipe keypoints x/y ONLY: selected smoothing_frames=${state.config.smoothing} smoothing_method=${state.config.smoothingMode} (1=none; max 5; no missing-center imputation); all derived quantities computed afterward without extra smoothing`,'# Keypoint-only single-pass smoothing: no separate temporal filtering of CoM, velocity, acceleration, forces, projected angles/angular velocity or release distance; NOT measured foot GRF',`# height_cm=${state.config.height} weight_kg=${state.config.weight} sex(anthropometric)=${state.config.sex}`,'# Contact candidates: sequential foot motion + relative bilateral toe/heel/ankle height difference, 3 stable observations; 2D unvalidated heuristic', '# footHeightDiffM: positive means lead foot appears higher than drive; camera perspective, steps and mounds can misclassify support', '# leadHorizontal/driveHorizontal: inward-positive reference magnitudes (foot -> CoM); each resultant equals hypot(vertical,horizontal) within the SAME frame', '# *HorizontalWorld: signed pitch-direction allocation, sums to forceHorizontal (not the inward-display convention)', '# releasePoint: estimated forward distance (m) from drive-ankle backward quantile to throwing index fingertip (wrist fallback); diamond = first prominent extension peak, NOT measured ball release', '# upperAngle/lowerAngle: apparent projected shoulder/hip angles in deg (NOT true 3D yaw); plotted on 04', '# twistAngle = upperAngle - lowerAngle in deg at the SAME frame (may be negative)', '# upperAngular/lowerAngular: apparent angular velocities in deg/s derived from the angle tracks; switchable graph with degree/s axis; card values are absolute peaks', '# twistAngular = upperAngular - lowerAngular at the same frame; NOT measured 3D torso torsion',`# contact_assumption=${state.analysis.contactAssumption}`,...state.analysis.events.map(e=>`# event=${e.foot}_${e.type},time_s=${e.t.toFixed(3)},quality=candidate`),keys.join(',')];
   for(const row of state.analysis.samples)lines.push(keys.map(k=>
     Number.isFinite(row[k])?row[k].toFixed(5):typeof row[k]==='string'?row[k]:'').join(','));
   const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='FORM_ANALYSIS_PUBLIC_v1.7.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notify('CSVを保存しました');

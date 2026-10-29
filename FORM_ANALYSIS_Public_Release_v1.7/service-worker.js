@@ -1,5 +1,5 @@
 /* Public Preview PWA, local same-origin assets only. */
-const CACHE='form-analysis-public-preview-v1.7-alltabs-force-20261028';
+const CACHE='form-analysis-public-preview-v1.7-angle-rate-toggle-20261029';
 const FILES=['./','./index.html','./js/public-v1.7.js','./css/public-v1.7.css','./manifest.webmanifest','./icons/icon.svg',
  './vendor/vision_bundle.mjs','./vendor/wasm/vision_wasm_internal.js','./vendor/wasm/vision_wasm_internal.wasm',
  './vendor/wasm/vision_wasm_nosimd_internal.js','./vendor/wasm/vision_wasm_nosimd_internal.wasm',

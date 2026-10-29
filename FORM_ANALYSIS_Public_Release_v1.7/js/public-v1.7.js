@@ -38,12 +38,15 @@ const PAGE={speed:{cards:[
  {id:'energy-wrist',name:'両手首並進エネルギー',keys:['wristEnergyL','wristEnergyR'],unit:'J',icon:'◈'},
  {id:'energy-tip',name:'両手先並進エネルギー',keys:['tipEnergyL','tipEnergyR'],unit:'J',icon:'◈'}
  ]},angular:{cards:[
- {id:'upper',name:'上胴角速度',keys:['upperAngular'],chartKeys:['upperAngle'],unit:'°/s',chartUnit:'°',icon:'⟳'},
- {id:'lower',name:'下胴角速度',keys:['lowerAngular'],chartKeys:['lowerAngle'],unit:'°/s',chartUnit:'°',icon:'⟳'},
- {id:'twist',name:'捻転角速度',keys:['twistAngular'],chartKeys:['twistAngle'],unit:'°/s',chartUnit:'°',icon:'⟲'}
+ {id:'upper-angle',name:'上胴角度',keys:['upperAngle'],unit:'°',icon:'⟳'},
+ {id:'lower-angle',name:'下胴角度',keys:['lowerAngle'],unit:'°',icon:'⟳'},
+ {id:'twist-angle',name:'捻転角度',keys:['twistAngle'],unit:'°',icon:'⟲'},
+ {id:'upper',name:'上胴角速度',keys:['upperAngular'],unit:'°/s',icon:'⟳'},
+ {id:'lower',name:'下胴角速度',keys:['lowerAngular'],unit:'°/s',icon:'⟳'},
+ {id:'twist',name:'捻転角速度',keys:['twistAngular'],unit:'°/s',icon:'⟲'}
  ]}};
 const DEFAULTS={height:175,weight:70,sex:'unspecified',hand:'right',direction:'right',mirrorSides:'no',model:'heavy',smoothing:3,fps:30,startTime:0,endTime:0,scale:'auto',manualScale:.002};
-const state={config:{...DEFAULTS},page:'speed',selected:{speed:new Set(['com','thorax','pelvis']),forces:new Set(['lead-resultant','drive-resultant']),dynamics:new Set(['stride']),angular:new Set(['upper','lower','twist'])},showForces:true,fileURL:null,mode:'empty',analysis:null,t:0,playing:false,analyzing:false,abort:null,showPose:true,showVideo:true,showArrows:true,guide:true};
+const state={config:{...DEFAULTS},page:'speed',selected:{speed:new Set(['com','thorax','pelvis']),forces:new Set(['lead-resultant','drive-resultant']),dynamics:new Set(['stride']),angular:new Set(['upper-angle','lower-angle','twist-angle'])},showForces:true,fileURL:null,mode:'empty',analysis:null,t:0,playing:false,analyzing:false,abort:null,showPose:true,showVideo:true,showArrows:true,guide:true};
 const safe=n=>Number.isFinite(n)?n:null;
 const lookup=(pose,index)=>{const v=pose?.[index];return v&&Number.isFinite(v.x)&&Number.isFinite(v.y)&&Math.min(v.visibility??1,v.presence??1)>=KEY_MIN?v:null;};
 const middle=(a,b)=>a&&b?{x:(a.x+b.x)/2,y:(a.y+b.y)/2}:null;
@@ -522,17 +525,13 @@ function computePublicMetrics(frames,params,width,heightPx){
   points.head=smoothPositionTrack(headRaw,times,smoothingFrames);
   points.com=comTrack;
   const pixelVelocity={};for(const k of Object.keys(points))pixelVelocity[k]=times.map((_,i)=>moment(points[k],i,times));
-  // Configurable centered smoothing of derivative series; 1 leaves the series unchanged.
-  function smooth(v){
-    const n=smoothingFrames,left=Math.floor((n-1)/2),right=n-1-left;
-    return v.map((x,i)=>{
-      if(!Number.isFinite(x))return null;
-      if(n===1)return x;
-      const nearby=v.slice(Math.max(0,i-left),Math.min(v.length,i+right+1)).filter(Number.isFinite);
-      return nearby.length?nearby.reduce((a,b)=>a+b,0)/nearby.length:null;
-    });
+  // One smoothing pass only: position tracks were smoothed above.
+  // Do not apply another moving average to derived speeds or accelerations;
+  // repeated smoothing attenuates rapid motion peaks.
+  const speeds={};
+  for(const k of Object.keys(points)){
+    speeds[k]=pixelVelocity[k].map(v=>v&&scale!=null?Math.hypot(v.x*width,v.y*heightPx)*scale:null);
   }
-  const speeds={};for(const k of Object.keys(points))speeds[k]=smooth(pixelVelocity[k].map(v=>v&&scale!=null?Math.hypot(v.x*width,v.y*heightPx)*scale:null));
   const vx=pixelVelocity.com.map(v=>v&&scale!=null?v.x*width*scale:null);
   const vy=pixelVelocity.com.map(v=>v&&scale!=null?-v.y*heightPx*scale:null);
   function diffNumeric(values,i){
@@ -542,8 +541,8 @@ function computePublicMetrics(frames,params,width,heightPx){
     if(p<0||q>=values.length||q-p>4||!Number.isFinite(values[i]))return null;
     const dt=times[q]-times[p];return dt>0?(values[q]-values[p])/dt:null;
   }
-  const ax=smooth(vx.map((_,i)=>diffNumeric(vx,i)));
-  const az=smooth(vy.map((_,i)=>diffNumeric(vy,i)));
+  const ax=vx.map((_,i)=>diffNumeric(vx,i));
+  const az=vy.map((_,i)=>diffNumeric(vy,i));
   const wristTrack=points[params.hand==='left'?'wristL':'wristR'];
   const wristAnchor=wristTrack.find(Boolean)?.x??null;
   const contact=detectContactSequence(frames,params,width,heightPx,scale);
@@ -756,9 +755,9 @@ function updateSeriesTabs(){
 
 function pickPage(name){if(!PAGE[name])return;state.page=name;buildCards();render();}
 function toggleCard(id){const current=state.selected[state.page];if(current.has(id))current.delete(id);else{
-  const selectedDef=PAGE[state.page].cards.find(c=>current.has(c.id));const selectedUnit=selectedDef?.unit;
+  const selectedDef=PAGE[state.page].cards.find(c=>current.has(c.id));const selectedUnit=selectedDef?.chartUnit||selectedDef?.unit;
   const def=PAGE[state.page].cards.find(c=>c.id===id);
-  if(selectedUnit&&selectedUnit!==def.unit){current.clear();notify('グラフの単位を切り替えました');}current.add(id);
+  if(selectedUnit&&selectedUnit!==(def.chartUnit||def.unit)){current.clear();notify('グラフの単位を切り替えました');}current.add(id);
 }buildCards();render();}
 function seriesKeys(){return chartDefs().filter(c=>state.selected[state.page].has(c.id)).flatMap(c=>c.chartKeys||c.keys);}
 function styleSeries(element,c){const primary=COLORS[c.keys[0]]||'#196d83';element.dataset.series='true';element.style.setProperty('--series-color',primary);element.style.setProperty('--series-secondary',COLORS[c.keys.at(-1)]||primary);element.style.setProperty('--series-ink','#fff');}
@@ -782,13 +781,13 @@ function buildCards(){
     tab.setAttribute('aria-pressed',String(active));
     // Current-frame figures are separate from the summary/maximum values in metric cards.
     const tabLabel=document.createElement('span');tabLabel.className='series-tab-name';
-    tabLabel.textContent=state.page==='angular'?c.name.replace('角速度','角度'):(c.tab||c.name.replace('速度','').replace('参考','').replace('全身',''));
+    tabLabel.textContent=state.page==='angular'?c.name:(c.tab||c.name.replace('速度','').replace('参考','').replace('全身',''));
     const tabValue=document.createElement('span');tabValue.className='series-tab-value';
     tabValue.id='tab_'+c.id;tabValue.textContent='—';
     tab.append(tabLabel,tabValue);
     tab.onclick=()=>toggleCard(c.id);$('tabs').append(tab);
   }
-  $('pageHelp').textContent=state.page==='angular'?'【2D投影参考推定】上部カードは角速度ピーク（°/s）、グラフは上胴角度・下胴角度・捻転角度（°）です。捻転角度＝上胴角度−下胴角度（同一フレーム）。肩・骨盤の投影幅から得る見かけの角度で、絶対的な3D軸回旋角度ではありません。カメラ方向・遮蔽・身体の傾きに左右され、欠測はゼロとして扱いません。':state.page==='forces'?'【参考推定】足部動作と左右足の高さ差から接地候補を推測し、支持点・推定重心・加速度から床反力を配分。脚別水平値は重心向きを正とする参考表示で、各足の実際の作用方向は独立には推定していません。▲離地、▼接地（候補）。':state.page==='dynamics'?'推定リリースポイントは、軸足足首の後方基準位置から投球側人差し指先（欠測時は手首）までの前方距離です。グラフの◆は投球期に最初に現れる有意な伸展ピークの推定時刻です。実際のボール離手点ではありません。部位エネルギーは概算質量比と速度による参考値です。':'速度は画像内2D位置の変化から求めています。重心はChandler身体部分質量モデルによる2D参考推定です。';
+  $('pageHelp').textContent=state.page==='angular'?'【2D投影参考推定】上胴・下胴・捻転の角度（°）と角速度（°/s）を、カード選択で切り替えます。異なる単位の系列は同時に表示せず、縦軸を切り替えます。角速度カードはピーク（°/s）です。捻転角度＝上胴角度−下胴角度（同一フレーム）。肩・骨盤の投影幅から得る見かけの角度で、絶対的な3D軸回旋角度ではありません。カメラ方向・遮蔽・身体の傾きに左右され、欠測はゼロとして扱いません。':state.page==='forces'?'【参考推定】足部動作と左右足の高さ差から接地候補を推測し、支持点・推定重心・加速度から床反力を配分。脚別水平値は重心向きを正とする参考表示で、各足の実際の作用方向は独立には推定していません。▲離地、▼接地（候補）。':state.page==='dynamics'?'推定リリースポイントは、軸足足首の後方基準位置から投球側人差し指先（欠測時は手首）までの前方距離です。グラフの◆は投球期に最初に現れる有意な伸展ピークの推定時刻です。実際のボール離手点ではありません。部位エネルギーは概算質量比と速度による参考値です。':'速度は画像内2D位置の変化から求めています。重心はChandler身体部分質量モデルによる2D参考推定です。';
   $('pageHelp').title=$('pageHelp').textContent;
   // Keep the same force visibility control in all four chart pages.
   // In 02 it controls the selected force curves themselves; in the other
@@ -972,7 +971,7 @@ function currentSummary(){
 }
 function render(){
   const d=timing();$('seek').max=d||1;$('seek').value=clamp(state.t,0,d||1);$('currentTime').textContent=timeLabel(state.t);$('duration').textContent=timeLabel(d);
-  $('chartTitle').textContent=state.page==='forces'?'脚別推定床反力（N）':state.page==='angular'?'回旋角度の推移（°）':(chartDefs().find(c=>state.selected[state.page].has(c.id))?.unit||'')+'の推移';
+  $('chartTitle').textContent=state.page==='forces'?'脚別推定床反力（N）':state.page==='angular'?((chartDefs().find(c=>state.selected.angular.has(c.id))?.unit==='°/s')?'回旋角速度の推移（°/s）':'回旋角度の推移（°）'):(chartDefs().find(c=>state.selected[state.page].has(c.id))?.unit||'')+'の推移';
   $('modeNote').textContent=state.analysis?`参考計算・${state.analysis.events.length}候補イベント`:'未解析';
   const phase=nearest()?.contactPhase??0;
   const phaseText=['両足支持（仮定）','踏込足 離地','両足支持（候補）','軸足 離地','軸足再接地（候補）'][phase];
@@ -1429,7 +1428,7 @@ async function snapshot(){
 }
 function exportCsv(){if(!stateReady()){notify('先に解析を実行してください');return;}
   const keys=['t','contactPhase','contactSource','footHeightDiffM','leadContact','driveContact','comSpeed','headSpeed','pelvisSpeed','thoraxSpeed','shoulderL','shoulderR','elbowL','elbowR','wristL','wristR','handTipL','handTipR','forceTotal','forceVertical','forceHorizontal','leadResultant','driveResultant','leadVertical','driveVertical','leadHorizontal','driveHorizontal','leadHorizontalWorld','driveHorizontalWorld','stride','wristTravel','energy','releasePoint','upperAngle','lowerAngle','twistAngle','upperAngular','lowerAngular','twistAngular','comEnergy','pelvisEnergy','shoulderEnergyL','shoulderEnergyR','elbowEnergyL','elbowEnergyR','wristEnergyL','wristEnergyR','tipEnergyL','tipEnergyR','shareLead'];
-  const lines=['# FORM ANALYSIS Public Preview v1.7','# Chandler segment-mass based 2D projected CoM (sex-stratified de Leva correction), research estimate; NOT measured 3D CoM',`# Position tracks: selected smoothing_frames=${state.config.smoothing} (1=none; max 5; no missing-center imputation); derivatives computed afterward`,'# Support-point load partition uses projected Chandler CoM and its acceleration; NOT measured foot GRF',`# height_cm=${state.config.height} weight_kg=${state.config.weight} sex(anthropometric)=${state.config.sex}`,'# Contact candidates: sequential foot motion + relative bilateral toe/heel/ankle height difference, 3 stable observations; 2D unvalidated heuristic', '# footHeightDiffM: positive means lead foot appears higher than drive; camera perspective, steps and mounds can misclassify support', '# leadHorizontal/driveHorizontal: inward-positive reference magnitudes (foot -> CoM); each resultant equals hypot(vertical,horizontal) within the SAME frame', '# *HorizontalWorld: signed pitch-direction allocation, sums to forceHorizontal (not the inward-display convention)', '# releasePoint: estimated forward distance (m) from drive-ankle backward quantile to throwing index fingertip (wrist fallback); diamond = first prominent extension peak, NOT measured ball release', '# upperAngle/lowerAngle: apparent projected shoulder/hip angles in deg (NOT true 3D yaw); plotted on 04', '# twistAngle = upperAngle - lowerAngle in deg at the SAME frame (may be negative)', '# upperAngular/lowerAngular: apparent angular velocities in deg/s derived from these angle tracks; displayed as card peaks only', '# twistAngular = upperAngular - lowerAngular at the same frame; NOT measured 3D torso torsion',`# contact_assumption=${state.analysis.contactAssumption}`,...state.analysis.events.map(e=>`# event=${e.foot}_${e.type},time_s=${e.t.toFixed(3)},quality=candidate`),keys.join(',')];
+  const lines=['# FORM ANALYSIS Public Preview v1.7','# Chandler segment-mass based 2D projected CoM (sex-stratified de Leva correction), research estimate; NOT measured 3D CoM',`# Position tracks: selected smoothing_frames=${state.config.smoothing} (1=none; max 5; no missing-center imputation); derivatives computed afterward`,'# One-pass position smoothing only: velocity and acceleration are not smoothed again; support-point load partition uses projected Chandler CoM and its acceleration; NOT measured foot GRF',`# height_cm=${state.config.height} weight_kg=${state.config.weight} sex(anthropometric)=${state.config.sex}`,'# Contact candidates: sequential foot motion + relative bilateral toe/heel/ankle height difference, 3 stable observations; 2D unvalidated heuristic', '# footHeightDiffM: positive means lead foot appears higher than drive; camera perspective, steps and mounds can misclassify support', '# leadHorizontal/driveHorizontal: inward-positive reference magnitudes (foot -> CoM); each resultant equals hypot(vertical,horizontal) within the SAME frame', '# *HorizontalWorld: signed pitch-direction allocation, sums to forceHorizontal (not the inward-display convention)', '# releasePoint: estimated forward distance (m) from drive-ankle backward quantile to throwing index fingertip (wrist fallback); diamond = first prominent extension peak, NOT measured ball release', '# upperAngle/lowerAngle: apparent projected shoulder/hip angles in deg (NOT true 3D yaw); plotted on 04', '# twistAngle = upperAngle - lowerAngle in deg at the SAME frame (may be negative)', '# upperAngular/lowerAngular: apparent angular velocities in deg/s derived from the angle tracks; switchable graph with degree/s axis; card values are absolute peaks', '# twistAngular = upperAngular - lowerAngular at the same frame; NOT measured 3D torso torsion',`# contact_assumption=${state.analysis.contactAssumption}`,...state.analysis.events.map(e=>`# event=${e.foot}_${e.type},time_s=${e.t.toFixed(3)},quality=candidate`),keys.join(',')];
   for(const row of state.analysis.samples)lines.push(keys.map(k=>
     Number.isFinite(row[k])?row[k].toFixed(5):typeof row[k]==='string'?row[k]:'').join(','));
   const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='FORM_ANALYSIS_PUBLIC_v1.7.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notify('CSVを保存しました');

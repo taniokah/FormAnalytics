@@ -181,3 +181,6 @@ The three 04 Angular Velocity metric cards retain the estimated peak angular spe
 
 - Tabs 01/03/04: `床反力 N` controls the drive/lead-foot resultant force overlay on a separate N scale. Tab 04 continues plotting projected angle (°) on the primary axis and displaying angular-velocity peak cards (°/s).
 - Tab 02: the same checkbox hides/restores selected GRF series, without changing their individual selections. The checkbox state is shared across tabs. All force values are estimates, not measurements.
+
+### Angular page axis switching
+The angular page provides separate apparent-angle (deg) and angular-rate (deg/s) curves for upper torso, pelvis and twist. Selecting a different unit clears the prior series and switches the primary graph axis. Angular-rate summary cards display peaks.

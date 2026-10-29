@@ -25,3 +25,14 @@
 - 02: switches its selected foot-force curves off/on while preserving which force series are selected; off-state displays an explicit message instead of meaningless scale values.
 - The checkbox state is shared across chart tabs and remains in effect when switching tabs.
 - Bumped offline cache identifier and stylesheet/script asset revision; no change to the biomechanical calculations.
+
+### 2026-10-29
+- 位置を平滑化した後の速度・加速度への再度の移動平均を廃止し、二重平滑化によるピーク減衰を抑制。
+- 設定1〜5フレーム（初期値3）、角度3系列と床反力4タブON/OFF、動画保存などは維持。
+
+## 04 角度／角速度 グラフ切替（v1.7 維持）
+- 上胴・下胴・捻転に角度（°）と角速度（°/s）の計6カードを配置。
+- 角速度カードは従来のピーク値（°/s）を維持。角度カードは角度の絶対ピーク参考値。
+- 選択した系列の単位が変わると03と同様に旧系列を非表示にし、縦軸とタイトルを切り替える。
+- 床反力 NのオーバーレイON/OFFおよび右軸は維持。
+- 位置系列の1回平滑化、角度系列の1回平滑化を維持し、微分後の再平滑化は実施しない。
